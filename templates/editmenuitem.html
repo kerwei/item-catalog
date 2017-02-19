@@ -1,0 +1,19 @@
+{% extends 'base.html' %}
+{% block content %}
+<h1> Edit Menu Item </h1>
+
+<form action="{{url_for('editMenuItem', restaurant_id = restaurant_id, menu_id = item.id)}}" method = 'POST'>
+<p>Name:</p>
+<input type='text' size='30' name='name' value='{{item.name}}'><br>
+<p>Price:</p>
+<input type='text' size='30' name='price' value='{{item.price}}'><br>
+<p>Course:</p>
+<input type='text' size='30' name='course' value='{{item.course}}'><br>
+<p>Description:</p>
+<input type='text' size='30' name='description' value='{{item.description}}'><br><br>
+<input type='submit' name='task' value='Create'>
+</form>
+<form action="{{url_for('viewMenuItem', restaurant_id = restaurant_id)}}">
+<input type='submit' name='task' value='Cancel'>
+</form>
+{% endblock %}

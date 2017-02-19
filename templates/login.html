@@ -1,0 +1,38 @@
+{% extends 'base.html' %}
+{% block content %}
+<h1> User Signup </h1>
+
+<form action="{{url_for('signupRestaurant')}}" method = 'POST'>
+<p>Name</p>
+
+{% if err_username %}
+    <input type='text' size='30' name='name' value='{{ username }}'><br>
+    <p>{{err_username}}</p>
+{% elif nan_message %}
+    <input type='text' size='30' name='name'><br>
+    <p>{{nan_message['username']}}</p>
+{% else %}
+    {% if username == None %}
+        <input type='text' size='30' name='name' ><br>
+    {% else %}
+        <input type='text' size='30' name='name' value='{{username}}'><br>
+    {% endif %}
+{% endif %}
+
+<p>Password</p>
+
+{% if err_password %}
+    <input type='text' size='30' name='password'><br>
+    <p>{{err_password}}</p> 
+{% elif nan_message %}
+    <input type='text' size='30' name='password'><br>
+    <p>{{nan_message['password']}}</p>     
+{% else %}
+    <input type='password' size='30' name='password'><br>
+{% endif %}
+
+<br><br>
+<input type='submit' value='Enter'>
+</form>
+
+{% endblock %}
