@@ -1,0 +1,20 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<!-- MESSAGE FLASHING -->
+{% with messages = get_flashed_messages() %}
+  {% if messages %}
+  <ul>
+    {% for message in messages %}
+      <li><strong>{{message}}</strong></li>
+    {% endfor %}
+  </ul>
+  {% endif %}
+{% endwith %}
+
+<div>
+  <h1>{{item.name}}</h1>
+  <p>{{item.description}}</p>
+</div>
+
+{% endblock %}

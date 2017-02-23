@@ -25,7 +25,6 @@ session = DBSession()
 @app.route('/restaurant/JSON')
 def restaurantJSON():
     restaurant = session.query(Restaurant).all()
-
     return jsonify(Restaurant=[i.serialize for i in restaurant])
 
 
@@ -41,38 +40,38 @@ def restaurantMenuJSON(restaurant_id):
 
 # Main landing page. Displays the list of restaurants
 # By categories and by last modified
-@app.route('/')
+@app.route('/', methods = ['GET'])
 def itemList():
     items = session.query(CatalogItem).order_by(CatalogItem.dt_modded).limit(5)
-    categories = session.query(CatalogItem).distinct(CatalogItem.category).all()
-    return render_template('index.html', items = items, categories = categories)
+    categories = session.query(CatalogItem.category).distinct(CatalogItem.category).all()
+    cat_name = list(k[0] for k in categories)
+    return render_template('index.html', items = items, categories = cat_name)
 
 
 # Displays all items of a category
-@app.route('/<string:category>')
+@app.route('/catalog/<string:category>/items', methods = ['GET'])
+@app.route('/catalog/<string:category>', methods = ['GET'])
 def viewCategory(category):
-    restaurant = session.query(Restaurant).filter_by(id = restaurant_id).one()
-    menu_local = session.query(MenuItem).filter_by(
-        restaurant_id = restaurant_id).all()
-
-    return render_template('menu.html',
-        restaurant = restaurant,
-        items=menu_local)
+    items = session.query(CatalogItem).filter_by(category = category).all()
+    categories = session.query(CatalogItem.category).distinct(CatalogItem.category).all()
+    cat_name = list(k[0] for k in categories)
+    return render_template('categorylist.html', items = items, category = category, categories = cat_name)
 
 
-@app.route('/restaurant')
-def restaurantList():
-    restaurant = session.query(Restaurant).all()
-    return render_template('restaurant.html', restaurant = restaurant)
+# Displays the selected item
+@app.route('/catalog/<string:category>/items/<int:item_id>', methods = ['GET'])
+def viewCatalogItem(category, item_id):
+    item = session.query(CatalogItem).filter_by(id = item_id).one()
+    return render_template('viewitem.html', item = item)
 
 
 # User Signup
 @app.route('/restaurant/signup', methods = ['POST', 'GET'])
 def signupRestaurant(username = None, err_username = None, err_password = None):
     if request.method == 'GET':
-        return render_template('signup.html', 
-            username = username, 
-            err_username = err_username, 
+        return render_template('signup.html',
+            username = username,
+            err_username = err_username,
             err_password = err_password)
 
     if request.method == 'POST':
@@ -80,18 +79,18 @@ def signupRestaurant(username = None, err_username = None, err_password = None):
         password = request.form['password']
         cpassword = request.form['cpassword']
 
-        nan_empty = authenticate.nempty(username = user_name, 
-            password = password, 
+        nan_empty = authenticate.nempty(username = user_name,
+            password = password,
             cpassword = cpassword)
         print nan_empty
         if nan_empty is not True:
             flash("Please ensure all fields are filled before submitting.")
             return render_template('signup.html',
-                username = user_name, 
+                username = user_name,
                 nan_username = nan_empty['err_username'],
                 nan_password = nan_empty['err_password'])
 
-        is_valid = authenticate.valid(username = user_name, 
+        is_valid = authenticate.valid(username = user_name,
             password = password)
 
         if is_valid is True and password == cpassword:
@@ -105,62 +104,55 @@ def signupRestaurant(username = None, err_username = None, err_password = None):
         else:
             flash("Username/password not valid. Please re-enter.")
             return render_template('signup.html',
-                username = user_name, 
+                username = user_name,
                 err_username = is_valid['err_username'],
                 err_password = is_valid['err_password'])
 
 
 # User Login
-@app.route('/restaurant/login', methods = ['POST', 'GET'])
-def loginRestaurant(username = None, err_username = None, err_password = None):
+@app.route('/login', methods = ['POST', 'GET'])
+def loginSite():
     if request.method == 'GET':
-        return render_template('login.html', 
-            username = username, 
-            err_username = err_username, 
-            err_password = err_password)
+        return render_template('login.html')
 
     if request.method == 'POST':
         user_name = request.form['name']
         password = request.form['password']
-        cpassword = request.form['cpassword']
 
-        nan_empty = authenticate.nempty(username = user_name, 
-            password = password, 
-            cpassword = cpassword)
+        nan_empty = authenticate.nempty(username = user_name,
+            password = password)
 
         if nan_empty is not True:
             flash("Please ensure all fields are filled before submitting.")
-            return redirect(url_for('signupRestaurant', nan_message = nan_empty))
+            return render_template('login.html', nan_message = nan_empty)
 
-        is_valid = authenticate.valid(username = user_name, 
+        is_valid = authenticate.valid(username = user_name,
             password = password)
 
-        if is_valid is True and password == cpassword:
+        if is_valid is True:
             hashbrown = authenticate.make_pw_hash(user_name, password)
-            user = User(name  = user_name,
-                salt = hashbrown.split('|')[-1],
-                hashedpw = hashbrown.split('|')[0])
-            flash("User created successfully!")
+            salt = hashbrown.split('|')[-1]
+            hashedpw = hashbrown.split('|')[0]
+            username = session.query(User.name).filter(name = user_name).one()
 
-            return redirect(url_for('restaurantList'))
+            if username:
+                user = session.query(User).filter(hashedpw = hashedpw).one()
+
+                if not user:
+                    flash("The entered password was incorrect. Please try again.")
+                return render_template('login.html', username = user_name)
+            else:
+                flash("User does not exist. Please check your username.")
+                return render_template('login.html', username = user_name)
+
+            flash("Welcome %s!" % user_name)
+            return redirect(url_for('itemList'))
         else:
             flash("Username/password not valid. Please re-enter.")
             return render_template('login.html',
-                username = user_name, 
+                username = user_name,
                 err_username = is_valid['err_username'],
                 err_password = is_valid['err_password'])
-
-
-# Displays the menu items of a single restaurant
-@app.route('/restaurant/<int:restaurant_id>/menu')
-def viewMenuItem(restaurant_id):
-    restaurant = session.query(Restaurant).filter_by(id = restaurant_id).one()
-    menu_local = session.query(MenuItem).filter_by(
-        restaurant_id = restaurant_id).all()
-
-    return render_template('menu.html',
-        restaurant = restaurant,
-        items=menu_local)
 
 
 # Adds a new menu item to a restaurant

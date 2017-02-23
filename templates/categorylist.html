@@ -1,0 +1,34 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<h1>{{ '%s (%s items)' % (category, items|length) }}</h1>
+
+<!-- MESSAGE FLASHING -->
+{% with messages = get_flashed_messages() %}
+  {% if messages %}
+  <ul>
+    {% for message in messages %}
+      <li><strong>{{message}}</strong></li>
+    {% endfor %}
+  </ul>
+  {% endif %}
+{% endwith %}
+
+{% for i in items %}
+<div>
+  <p><a href="{{url_for('viewCatalogItem', category = category, item_id = i.id)}}">{{i.name}}</a></p>
+  <p>{{i.dt_modded}}</p>
+</div>
+{% endfor %}
+
+<h1>View Categories</h1>
+<!-- Display for category -->
+<div>
+  {% for cat in categories %}
+  <ul>
+    <a href="{{url_for('viewCategory', category = cat)}}"><p>{{cat}}</p></a>
+  </ul>
+  {% endfor %}
+</div>
+
+{% endblock %}
