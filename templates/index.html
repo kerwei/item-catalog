@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 {% block content %}
 
-{% for each in restaurant %}
+{% for each in items %}
 
 <div>
   <ul>
@@ -12,5 +12,17 @@
 </div>
 
 {% endfor %}
+
+{% for cat in categories %}
+<!-- Display for category -->
+<div>
+  <ul>
+  <a href="{{url_for('', category = cat)}}">
+    <p>{{cat}}</p>
+  </a>
+  </ul>
+</div>
+{% endfor %}
+
 
 {% endblock %}

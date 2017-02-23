@@ -9,13 +9,13 @@ from sqlalchemy.orm import sessionmaker
 
 # Local custom modules
 import authenticate
-from database_setup import Base, Restaurant, MenuItem, User
+from database_setup import Base, CatalogItem, User
 
 
 app = Flask(__name__)
 
 # Starts the database
-engine = create_engine('sqlite:///restaurantmenu.db')
+engine = create_engine('sqlite:///catalogitem.db')
 Base.metadata.bind = engine
 DBSession = sessionmaker(bind = engine)
 session = DBSession()
@@ -40,7 +40,26 @@ def restaurantMenuJSON(restaurant_id):
 
 
 # Main landing page. Displays the list of restaurants
+# By categories and by last modified
 @app.route('/')
+def itemList():
+    items = session.query(CatalogItem).order_by(CatalogItem.dt_modded).limit(5)
+    categories = session.query(CatalogItem).distinct(CatalogItem.category).all()
+    return render_template('index.html', items = items, categories = categories)
+
+
+# Displays all items of a category
+@app.route('/<string:category>')
+def viewCategory(category):
+    restaurant = session.query(Restaurant).filter_by(id = restaurant_id).one()
+    menu_local = session.query(MenuItem).filter_by(
+        restaurant_id = restaurant_id).all()
+
+    return render_template('menu.html',
+        restaurant = restaurant,
+        items=menu_local)
+
+
 @app.route('/restaurant')
 def restaurantList():
     restaurant = session.query(Restaurant).all()
