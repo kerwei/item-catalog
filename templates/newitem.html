@@ -1,0 +1,33 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<h1> Add an Item </h1>
+{% if get_flashed_messages() %}
+<form action="{{url_for('newItem')}}" method = 'POST'>
+  <p>Name:</p>
+  <input type='text' size='30' name='name' value='{{name}}'><br>
+  <p>Price:</p>
+  <input type='text' size='30' name='price' value='{{price}}'><br>
+  <p>Category:</p>
+  <input type='text' size='30' name='category' value='{{category}}'><br>
+  <p>Description:</p>
+  <input type='text' size='30' name='description' value='{{description}}'><br><br>
+  <input type='submit' value='Create'>
+  <input type='submit' value='Cancel'>
+</form>
+{% else %}
+<form action="{{url_for('newItem')}}" method = 'POST'>
+  <p>Name:</p>
+  <input type='text' size='30' name='name'><br>
+  <p>Price:</p>
+  <input type='text' size='30' name='price'><br>
+  <p>Category:</p>
+  <input type='text' size='30' name='category'><br>
+  <p>Description:</p>
+  <input type='text' size='30' name='description'><br><br>
+  <input type='submit' value='Create'>
+  <input type='submit' value='Cancel'>
+</form>
+{% endif %}
+
+{% endblock %}

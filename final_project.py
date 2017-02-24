@@ -175,8 +175,8 @@ def loginSite():
 @app.route('/logout', methods = ['GET'])
 def logoutSite():
     if 'userid' in login_session:
-        user_id = login_session.get('userid')
-        username = session.query(User.name).filter_by(id = user_id).one()
+        user_id = login_session.get('userid')[0][0]
+        username = session.query(User.name).filter_by(id = int(user_id)).one()
 
         login_session.pop('userid', None)
         flash("Goodbye %s!" % username)
@@ -185,26 +185,42 @@ def logoutSite():
 
 
 # Adds a new menu item to a restaurant
-@app.route('/restaurant/<int:restaurant_id>/menu/add',
+@app.route('/catalog/item/add',
     methods = ['POST', 'GET'])
-def newMenuItem(restaurant_id):
+def newItem():
     if request.method == 'GET':
-        return render_template('newmenuitem.html',
-            restaurant_id = restaurant_id)
+        return render_template('newitem.html')
 
     if request.method == 'POST':
-        restaurant = session.query(Restaurant).filter_by(
-            id = restaurant_id).one()
-        new_menuitem = MenuItem(name = request.form['name'],
-            price  = request.form['price'],
-            course  = request.form['course'],
-            description = request.form['description'],
-            restaurant = restaurant)
-        session.add(new_menuitem)
-        session.commit()
-        flash("New menu item created!")
+        if 'userid'  not in login_session:
+            flash("Please log in first to add an item.")
+            return redirect(url_for('loginSite'))
 
-        return redirect(url_for('viewMenuItem', restaurant_id = restaurant_id))
+        if len(request.form['name']) == 0:
+            flash("The name of the item is mandatory!")
+            return render_template('newitem.html',
+                name = request.form['name'],
+                price = request.form['price'],
+                category = request.form['category'],
+                description = request.form['description'])
+
+        user_id = login_session.get('userid')[0][0]
+        user = session.query(User).filter_by(id = int(user_id)).one()
+
+        new_item = CatalogItem(name = request.form['name'],
+            price  = request.form['price'],
+            category  = request.form['category'],
+            description = request.form['description'],
+            user = user)
+        session.add(new_item)
+        session.commit()
+
+        item = session.query(CatalogItem).order_by(desc(CatalogItem.dt_added)).limit(1).one()
+        flash("New item added!")
+
+        return redirect(url_for('viewCatalogItem',
+            category = item.category,
+            item_id = item.id))
 
 
 # Edits a single menu item of a restaurant
