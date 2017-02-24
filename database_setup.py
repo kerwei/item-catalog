@@ -18,6 +18,7 @@ class User(Base):
     email = Column(String(250), nullable = True)
     salt = Column(String(250), nullable = False)
     hashedpw = Column(String(250), nullable = False)
+    dt_added = Column(DateTime, nullable = False, default = datetime.datetime.now())
 
 
 class CatalogItem(Base):

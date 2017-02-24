@@ -22,11 +22,11 @@
 <p>Password</p>
 
 {% if err_password %}
-    <input type='text' size='30' name='password'><br>
-    <p>{{err_password}}</p> 
+    <input type='password' size='30' name='password'><br>
+    <p>{{err_password}}</p>
 {% elif nan_password %}
-    <input type='text' size='30' name='password'><br>
-    <p>{{nan_password}}</p>     
+    <input type='password' size='30' name='password'><br>
+    <p>{{nan_password}}</p>
 {% else %}
     <input type='password' size='30' name='password'><br>
 {% endif %}

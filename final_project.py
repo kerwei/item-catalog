@@ -8,6 +8,7 @@ from flask import session as login_session
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.orm.exc import NoResultFound
+from sqlalchemy import desc
 
 # Local custom modules
 import authenticate
@@ -68,13 +69,10 @@ def viewCatalogItem(category, item_id):
 
 
 # User Signup
-@app.route('/restaurant/signup', methods = ['POST', 'GET'])
-def signupRestaurant(username = None, err_username = None, err_password = None):
+@app.route('/signup', methods = ['POST', 'GET'])
+def signupRestaurant():
     if request.method == 'GET':
-        return render_template('signup.html',
-            username = username,
-            err_username = err_username,
-            err_password = err_password)
+        return render_template('signup.html')
 
     if request.method == 'POST':
         user_name = request.form['name']
@@ -84,25 +82,35 @@ def signupRestaurant(username = None, err_username = None, err_password = None):
         nan_empty = authenticate.nempty(username = user_name,
             password = password,
             cpassword = cpassword)
-        print nan_empty
+
         if nan_empty is not True:
             flash("Please ensure all fields are filled before submitting.")
             return render_template('signup.html',
                 username = user_name,
                 nan_username = nan_empty['err_username'],
-                nan_password = nan_empty['err_password'])
+                nan_password = nan_empty['err_password'],
+                nan_cpassword = nan_empty['err_cpassword'])
 
         is_valid = authenticate.valid(username = user_name,
             password = password)
 
-        if is_valid is True and password == cpassword:
-            hashbrown = authenticate.make_pw_hash(user_name, password)
-            user = User(name  = user_name,
-                salt = hashbrown.split('|')[-1],
-                hashedpw = hashbrown.split('|')[0])
-            flash("User created successfully!")
+        if is_valid is True:
+            if password == cpassword:
+                hashbrown = authenticate.make_pw_hash(user_name, password)
+                user = User(name  = user_name,
+                    salt = hashbrown.split('|')[1],
+                    hashedpw = hashbrown.split('|')[0])
+                session.add(user)
+                session.commit()
+                user_id = session.query(User.id).order_by(desc(User.dt_added)).limit(1).all()
 
-            return redirect(url_for('restaurantList'))
+                login_session['userid'] = user_id
+                flash("User created successfully! Welcome %s!" % user_name)
+
+                return redirect(url_for('itemList'))
+            else:
+                flash("The passwords entered do not match. Please re-enter.")
+                return render_template('signup.html', username = user_name)
         else:
             flash("Username/password not valid. Please re-enter.")
             return render_template('signup.html',
@@ -161,6 +169,19 @@ def loginSite():
                 username = user_name,
                 err_username = is_valid['err_username'],
                 err_password = is_valid['err_password'])
+
+
+# Logs out from the site
+@app.route('/logout', methods = ['GET'])
+def logoutSite():
+    if 'userid' in login_session:
+        user_id = login_session.get('userid')
+        username = session.query(User.name).filter_by(id = user_id).one()
+
+        login_session.pop('userid', None)
+        flash("Goodbye %s!" % username)
+
+    return redirect(url_for('itemList'))
 
 
 # Adds a new menu item to a restaurant
