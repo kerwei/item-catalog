@@ -4,8 +4,10 @@ import pdb
 # Third party modules
 from flask import Flask
 from flask import request, render_template, redirect, url_for, flash, jsonify
+from flask import session as login_session
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
+from sqlalchemy.orm.exc import NoResultFound
 
 # Local custom modules
 import authenticate
@@ -130,21 +132,27 @@ def loginSite():
             password = password)
 
         if is_valid is True:
-            hashbrown = authenticate.make_pw_hash(user_name, password)
-            salt = hashbrown.split('|')[-1]
-            hashedpw = hashbrown.split('|')[0]
-            username = session.query(User.name).filter(name = user_name).one()
+            username = session.query(User).filter_by(name = user_name).all()
 
             if username:
-                user = session.query(User).filter(hashedpw = hashedpw).one()
+                for each in username:
+                    salt = each.salt
+                    hashedpw = authenticate.make_pw_hash(user_name, password, salt).split('|')[0]
+                    try:
+                        user = session.query(User).filter_by(hashedpw = hashedpw).one()
+                        if user:
+                           break
+                    except NoResultFound:
+                        user = None
 
                 if not user:
                     flash("The entered password was incorrect. Please try again.")
-                return render_template('login.html', username = user_name)
+                    return render_template('login.html', username = user_name)
             else:
                 flash("User does not exist. Please check your username.")
                 return render_template('login.html', username = user_name)
 
+            login_session['userid'] = user.id
             flash("Welcome %s!" % user_name)
             return redirect(url_for('itemList'))
         else:

@@ -18,8 +18,9 @@ def make_salt():
     return ''.join(random.sample(string.letters,constants.SALT_LENGTH))
 
 # Make password hash
-def make_pw_hash(name, pw):
-    x = make_salt()
+def make_pw_hash(name, pw, x = None):
+    if x is None:
+        x = make_salt()
     return "%s|%s" % (hashlib.sha256(name + pw + x).hexdigest(),x)
 
 # Validates the input username
@@ -65,19 +66,21 @@ def nempty(**kwargs):
     err_username = None
     err_password = None
     err_cpassword = None
-    
+
     if len(kwargs['username']) == 0:
         err_username = "Please enter a user name."
 
     if len(kwargs['password']) == 0:
         err_password = "Please enter a password."
 
-    if len(kwargs['cpassword']) == 0:
-        err_cpassword = "Please re-enter your password."
+    if 'cpassword' in kwargs:
+        if len(kwargs['cpassword']) == 0:
+            err_cpassword = "Please re-enter your password."
 
-    if len(kwargs['username']) * \
-    len(kwargs['password']) * len(kwargs['cpassword']) == 0:
-        return {'err_username': err_username, 
+    if (err_username is not None) | \
+    (err_password is not None) | \
+    (err_cpassword is not None):
+        return {'err_username': err_username,
         'err_password': err_password,
         'err_cpassword': err_cpassword}
     else:

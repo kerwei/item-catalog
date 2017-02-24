@@ -25,9 +25,9 @@ password = 'password'
 
 f = list(codecs.open('names.txt', encoding='utf-8-sig', mode='rb'))
 # Menu for UrbanBurger
-name = random.choice(f).replace('\r\n', '')
+name = random.choice(f).replace('\r\n', '').replace(' ', '_')
 hashbrown = authenticate.make_pw_hash(name, password)
-user1 = User(name=name, salt=hashbrown.split('|')[0], hashedpw=hashbrown.split('|')[1])
+user1 = User(name=name, salt=hashbrown.split('|')[1], hashedpw=hashbrown.split('|')[0])
 
 session.add(user1)
 session.commit()
@@ -89,9 +89,9 @@ session.commit()
 
 
 # Menu for Super Stir Fry
-name = random.choice(f).replace('\r\n', '')
+name = random.choice(f).replace('\r\n', '').replace(' ', '_')
 hashbrown = authenticate.make_pw_hash(name, password)
-user2 = User(name=name, salt=hashbrown.split('|')[0], hashedpw=hashbrown.split('|')[1])
+user2 = User(name=name, salt=hashbrown.split('|')[1], hashedpw=hashbrown.split('|')[0])
 
 session.add(user2)
 session.commit()
@@ -135,9 +135,9 @@ session.commit()
 
 
 # Menu for Panda Garden
-name = random.choice(f).replace('\r\n', '')
+name = random.choice(f).replace('\r\n', '').replace(' ', '_')
 hashbrown = authenticate.make_pw_hash(name, password)
-user1 = User(name=name, salt=hashbrown.split('|')[0], hashedpw=hashbrown.split('|')[1])
+user1 = User(name=name, salt=hashbrown.split('|')[1], hashedpw=hashbrown.split('|')[0])
 
 session.add(user1)
 session.commit()
@@ -175,9 +175,9 @@ session.commit()
 
 
 # Menu for Thyme for that
-name = random.choice(f).replace('\r\n', '')
+name = random.choice(f).replace('\r\n', '').replace(' ', '_')
 hashbrown = authenticate.make_pw_hash(name, password)
-user1 = User(name=name, salt=hashbrown.split('|')[0], hashedpw=hashbrown.split('|')[1])
+user1 = User(name=name, salt=hashbrown.split('|')[1], hashedpw=hashbrown.split('|')[0])
 
 session.add(user1)
 session.commit()
@@ -221,9 +221,9 @@ session.commit()
 
 
 # Menu for Tony's Bistro
-name = random.choice(f).replace('\r\n', '')
+name = random.choice(f).replace('\r\n', '').replace(' ', '_')
 hashbrown = authenticate.make_pw_hash(name, password)
-user1 = User(name=name, salt=hashbrown.split('|')[0], hashedpw=hashbrown.split('|')[1])
+user1 = User(name=name, salt=hashbrown.split('|')[1], hashedpw=hashbrown.split('|')[0])
 
 session.add(user1)
 session.commit()
@@ -261,9 +261,9 @@ session.commit()
 
 
 # Menu for Andala's
-name = random.choice(f).replace('\r\n', '')
+name = random.choice(f).replace('\r\n', '').replace(' ', '_')
 hashbrown = authenticate.make_pw_hash(name, password)
-user1 = User(name=name, salt=hashbrown.split('|')[0], hashedpw=hashbrown.split('|')[1])
+user1 = User(name=name, salt=hashbrown.split('|')[1], hashedpw=hashbrown.split('|')[0])
 
 session.add(user1)
 session.commit()
@@ -301,9 +301,9 @@ session.commit()
 
 
 # Menu for Auntie Ann's
-name = random.choice(f).replace('\r\n', '')
+name = random.choice(f).replace('\r\n', '').replace(' ', '_')
 hashbrown = authenticate.make_pw_hash(name, password)
-user1 = User(name=name, salt=hashbrown.split('|')[0], hashedpw=hashbrown.split('|')[1])
+user1 = User(name=name, salt=hashbrown.split('|')[1], hashedpw=hashbrown.split('|')[0])
 
 session.add(user1)
 session.commit()
@@ -353,9 +353,9 @@ session.commit()
 
 
 # Menu for Cocina Y Amor
-name = random.choice(f).replace('\r\n', '')
+name = random.choice(f).replace('\r\n', '').replace(' ', '_')
 hashbrown = authenticate.make_pw_hash(name, password)
-user1 = User(name=name, salt=hashbrown.split('|')[0], hashedpw=hashbrown.split('|')[1])
+user1 = User(name=name, salt=hashbrown.split('|')[1], hashedpw=hashbrown.split('|')[0])
 
 session.add(user1)
 session.commit()
@@ -374,7 +374,7 @@ session.add(catalogItem2)
 session.commit()
 
 hashbrown = authenticate.make_pw_hash(name, password)
-user1 = User(name=name, salt=hashbrown.split('|')[0], hashedpw=hashbrown.split('|')[1])
+user1 = User(name=name, salt=hashbrown.split('|')[1], hashedpw=hashbrown.split('|')[0])
 session.add(user1)
 session.commit()
 

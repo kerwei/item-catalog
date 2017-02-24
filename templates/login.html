@@ -2,17 +2,6 @@
 {% block content %}
 <h1> User Signup </h1>
 
-<!-- MESSAGE FLASHING -->
-{% with messages = get_flashed_messages() %}
-  {% if messages %}
-  <ul>
-    {% for message in messages %}
-      <li><strong>{{message}}</strong></li>
-    {% endfor %}
-  </ul>
-  {% endif %}
-{% endwith %}
-
 <form action="{{url_for('loginSite')}}" method = 'POST'>
 <p>Name</p>
 
@@ -33,10 +22,10 @@
 <p>Password</p>
 
 {% if err_password %}
-    <input type='text' size='30' name='password'><br>
+    <input type='password' size='30' name='password'><br>
     <p>{{err_password}}</p>
 {% elif nan_message %}
-    <input type='text' size='30' name='password'><br>
+    <input type='password' size='30' name='password'><br>
     <p>{{nan_message['password']}}</p>
 {% else %}
     <input type='password' size='30' name='password'><br>
