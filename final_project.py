@@ -250,22 +250,32 @@ def editMenuItem(restaurant_id, menu_id):
 
 
 # Deletes a menu item
-@app.route('/restaurant/<int:restaurant_id>/menu/<int:menu_id>/delete',
+@app.route('/catalog/item/<int:item_id>/delete',
     methods = ['POST', 'GET'])
-def deleteMenuItem(restaurant_id, menu_id):
-    item = session.query(MenuItem).filter_by(id = menu_id).one()
+def deleteItem(item_id):
+    item = session.query(CatalogItem).filter_by(id = item_id).one()
 
     if request.method == 'GET':
-        return render_template('deletemenuitem.html',
-            restaurant_id = restaurant_id,
-            item = item)
+        return render_template('deleteitem.html', item = item)
 
     if request.method == 'POST':
-        session.delete(item)
-        session.commit()
-        flash("Menu item deleted!")
+        if 'userid'  not in login_session:
+            flash("Please log in first to add an item.")
+            return redirect(url_for('loginSite'))
 
-        return redirect(url_for('viewMenuItem', restaurant_id = restaurant_id))
+        user_id = login_session['userid']
+
+        if user_id == item.user_id:
+            session.delete(item)
+            session.commit()
+            flash("Item deleted!")
+        else:
+            flash("You are not authorized to delete this item!")
+            return redirect(url_for('viewCatalogItem',
+                category = item.category,
+                item_id = item.id))
+
+        return redirect(url_for('itemList'))
 
 
 if __name__ == '__main__':
