@@ -4,7 +4,7 @@ import pdb
 # Third party modules
 from flask import Flask
 from flask import request, render_template, redirect, url_for, flash, jsonify
-from flask import session as login_session
+from flask import session as login_session, escape
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.orm.exc import NoResultFound
@@ -175,7 +175,7 @@ def loginSite():
 @app.route('/logout', methods = ['GET'])
 def logoutSite():
     if 'userid' in login_session:
-        user_id = login_session.get('userid')[0][0]
+        user_id = escape(login_session.get('userid'))
         username = session.query(User.name).filter_by(id = int(user_id)).one()
 
         login_session.pop('userid', None)
@@ -204,7 +204,7 @@ def newItem():
                 category = request.form['category'],
                 description = request.form['description'])
 
-        user_id = login_session.get('userid')[0][0]
+        user_id = escape(login_session.get('userid'))
         user = session.query(User).filter_by(id = int(user_id)).one()
 
         new_item = CatalogItem(name = request.form['name'],
@@ -224,29 +224,40 @@ def newItem():
 
 
 # Edits a single menu item of a restaurant
-@app.route('/restaurant/<int:restaurant_id>/menu/<int:menu_id>/edit',
+@app.route('/catalog/item/<int:item_id>/edit',
     methods = ['POST', 'GET'])
-def editMenuItem(restaurant_id, menu_id):
-    item = session.query(MenuItem).filter_by(id = menu_id).one()
+def editItem(item_id):
+    item = session.query(CatalogItem).filter_by(id = item_id).one()
+
+    if not item:
+        flash("Invalid item. Please check that you have selected a valid item.")
+        return redirect(url_for('viewCatalogItem', item_id = item_id))
 
     if request.method == 'GET':
-        return render_template('editmenuitem.html',
-            restaurant_id = restaurant_id,
-            item = item)
+        return render_template('edititem.html', item = item)
 
     if request.method == 'POST':
-        restaurant = session.query(Restaurant).filter_by(
-            id = restaurant_id).one()
-        item.name = request.form['name']
-        item.price = request.form['price']
-        item.course = request.form['course']
-        item.description = request.form['description']
-        item.restaurant = restaurant
-        session.add(item)
-        session.commit()
-        flash("Menu item edited!")
+        if 'userid'  not in login_session:
+            flash("Please log in first to edit the item.")
+            return redirect(url_for('loginSite'))
 
-        return redirect(url_for('viewMenuItem', restaurant_id = restaurant_id))
+        user_id = escape(login_session['userid'])
+
+        if user_id == item.user_id:        
+            item.name = request.form['name']
+            item.price = request.form['price']
+            item.category = request.form['category']
+            item.description = request.form['description']
+            session.add(item)
+            session.commit()
+            flash("Item saved successfully!")
+        else:
+            flash("You are not authorized to delete this item!")
+            return redirect(url_for('viewCatalogItem',
+                category = item.category,
+                item_id = item.id))            
+
+        return redirect(url_for('viewCatalogItem', category = item.category, item_id = item.id))
 
 
 # Deletes a menu item
@@ -255,15 +266,19 @@ def editMenuItem(restaurant_id, menu_id):
 def deleteItem(item_id):
     item = session.query(CatalogItem).filter_by(id = item_id).one()
 
+    if not item:
+        flash("Invalid item. Please check that you have selected a valid item.")
+        return redirect(url_for('viewCatalogItem', item_id = item_id))
+
     if request.method == 'GET':
         return render_template('deleteitem.html', item = item)
 
     if request.method == 'POST':
         if 'userid'  not in login_session:
-            flash("Please log in first to add an item.")
+            flash("Please log in first to delete the item.")
             return redirect(url_for('loginSite'))
 
-        user_id = login_session['userid']
+        user_id = escape(login_session['userid'])
 
         if user_id == item.user_id:
             session.delete(item)
