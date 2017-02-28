@@ -160,6 +160,10 @@ def loginSite():
                 flash("User does not exist. Please check your username.")
                 return render_template('login.html', username = user_name)
 
+            state = ''.join(random.choice(string.ascii_uppercase +
+                string.digits +
+                string.ascii_lowercase) for x in xrange(32))
+            login_session['state'] = state
             login_session['userid'] = user.id
             flash("Welcome %s!" % user_name)
             return redirect(url_for('itemList'))
@@ -243,7 +247,7 @@ def editItem(item_id):
 
         user_id = escape(login_session['userid'])
 
-        if user_id == item.user_id:        
+        if user_id == item.user_id:
             item.name = request.form['name']
             item.price = request.form['price']
             item.category = request.form['category']
@@ -255,7 +259,7 @@ def editItem(item_id):
             flash("You are not authorized to delete this item!")
             return redirect(url_for('viewCatalogItem',
                 category = item.category,
-                item_id = item.id))            
+                item_id = item.id))
 
         return redirect(url_for('viewCatalogItem', category = item.category, item_id = item.id))
 
