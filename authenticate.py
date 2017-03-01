@@ -41,6 +41,13 @@ def valid_cookie(cookie):
         dough = cookie.split('|')[0]
         return roast_chip(dough) == cookie
 
+# Validate the state token
+def valid_statetoken(state, sessionvar):
+    if state != sessionvar:
+        return False
+    else:
+        return True
+
 # Checks the validity of all input fields
 def valid(**kwargs):
     err_username = None
