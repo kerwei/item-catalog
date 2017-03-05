@@ -316,7 +316,7 @@ def deleteItem(item_id):
 @app.route('/gconnect', methods=['POST'])
 def gconnect():
     # Validate state token
-    if not valid_statetoken(request.args.get('state'), login_session['state']):
+    if not authenticate.valid_statetoken(request.args.get('state'), login_session['state']):
         response = make_response(json.dumps('Invalid state parameter.'), 401)
         response.headers['Content-Type'] = 'application/json'
         return response
