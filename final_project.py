@@ -380,6 +380,7 @@ def gconnect():
     params = {'access_token': credentials.access_token, 'alt': 'json'}
     answer = requests.get(userinfo_url, params=params)
 
+    # Add code to add user to local db if user does not exist
     data = answer.json()
 
     login_session['username'] = data['name']
@@ -422,9 +423,10 @@ def gdisconnect():
         del login_session['email']
         del login_session['picture']
 
-        response = make_response(json.dumps('Successfully disconnected.'), 200)
-        response.headers['Content-Type'] = 'application/json'
-        return response
+        flash("Successfully disconnected!")
+        #response = make_response(json.dumps('Successfully disconnected.'), 200)
+        # response.headers['Content-Type'] = 'application/json'
+        return redirect(url_for('itemList'))
 
     else:
         response = make_response(json.dumps('Failed to revoke token for given user.', 400))
