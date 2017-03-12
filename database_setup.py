@@ -16,6 +16,7 @@ class User(Base):
     id = Column(Integer, primary_key = True)
     name = Column(String(250), nullable = False)
     email = Column(String(250), nullable = True)
+    picture = Column(String(1000), nullable = True)
     salt = Column(String(250), nullable = False)
     hashedpw = Column(String(250), nullable = False)
     dt_added = Column(DateTime, nullable = False, default = datetime.datetime.now())
@@ -41,7 +42,7 @@ class CatalogItem(Base):
             'description': self.description,
             'id': self.id,
             'price': self.price,
-            'category': self.course,
+            'category': self.category,
         }
 
 

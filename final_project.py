@@ -20,6 +20,7 @@ import requests
 # Local custom modules
 import authenticate
 from database_setup import Base, CatalogItem, User
+import dbfunctions
 
 
 app = Flask(__name__)
@@ -29,28 +30,14 @@ CLIENT_ID = json.loads(
     open('client_secrets.json', 'r').read())['web']['client_id']
 APPLICATION_NAME = "Item Catalog App"
 
-# Starts the database
-engine = create_engine('sqlite:///catalogitem.db')
-Base.metadata.bind = engine
-DBSession = sessionmaker(bind = engine)
-session = DBSession()
+# Get a DB session
+session = dbfunctions.getDbSession()
 
-
-# API request endpoint for the full list of available restaurants
-@app.route('/restaurant/JSON')
-def restaurantJSON():
-    restaurant = session.query(Restaurant).all()
-    return jsonify(Restaurant=[i.serialize for i in restaurant])
-
-
-# API request endpoint the menu of the specified restaurant
-@app.route('/restaurant/<int:restaurant_id>/menu/JSON')
-def restaurantMenuJSON(restaurant_id):
-    restaurant = session.query(Restaurant).filter_by(id=restaurant_id).one()
-    items = session.query(MenuItem).filter_by(
-        restaurant_id=restaurant_id).all()
-
-    return jsonify(MenuItems=[i.serialize for i in items])
+# API request endpoint for the full list of available catalog items
+@app.route('/catalog/JSON')
+def catalogitemJSON():
+    catalogitem = session.query(CatalogItem).all()
+    return jsonify(CatalogItem=[i.serialize for i in catalogitem])
 
 
 # Main landing page. Displays the list of restaurants
@@ -58,7 +45,7 @@ def restaurantMenuJSON(restaurant_id):
 @app.route('/', methods = ['GET'])
 def itemList():
     items = session.query(CatalogItem).order_by(CatalogItem.dt_modded).limit(5)
-    categories = session.query(CatalogItem.category).distinct(CatalogItem.category).all()
+    categories = dbfunctions.getUnique(CatalogItem.category)
     cat_name = list(k[0] for k in categories)
     return render_template('index.html', items = items, categories = cat_name)
 
@@ -135,11 +122,8 @@ def signupRestaurant():
 @app.route('/login', methods = ['POST', 'GET'])
 def loginSite():
     if request.method == 'GET':
-        state = ''.join(random.choice(string.ascii_uppercase +
-            string.digits +
-            string.ascii_lowercase) for x in xrange(32))
-        login_session['state'] = state
-        return render_template('login.html', STATE = state)
+        login_session['state'] = authenticate.gen_state()
+        return render_template('login.html', STATE = login_session['state'])
 
     if request.method == 'POST':
         user_name = request.form['name']
@@ -387,6 +371,12 @@ def gconnect():
     login_session['picture'] = data['picture']
     login_session['email'] = data['email']
 
+    # see if user exists
+    user_gp = authenticate.getUserByEmail(login_session['email'])
+    if not user_gp:
+        user_id = authenticate.createUser(login_session)
+    login_session['user_id'] = user_id
+
     output = ''
     output += '<h1>Welcome, '
     output += login_session['username']
@@ -442,7 +432,6 @@ def fbconnect():
         response.headers['Content-Type'] = 'application/json'
         return response
     access_token = request.data
-    print "access token received %s " % access_token
 
     app_id = json.loads(open('fb_client_secrets.json', 'r').read())[
         'web']['app_id']
@@ -483,9 +472,9 @@ def fbconnect():
     login_session['picture'] = data["data"]["url"]
 
     # see if user exists
-    user_id = getUserID(login_session['email'])
-    if not user_id:
-        user_id = createUser(login_session)
+    user_fb = authenticate.getUserByEmail(login_session['email'])
+    if not user_fb:
+        user_id = authenticate.createUser(login_session)
     login_session['user_id'] = user_id
 
     output = ''

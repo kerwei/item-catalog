@@ -8,7 +8,6 @@ import constants
 
 
 '''Helper functions for the application'''
-
 # Make hash with secret
 def roast_chip(chip):
     return '%s|%s' % (chip, hashlib.sha256(chip + constants.SECRET).hexdigest())
@@ -22,6 +21,17 @@ def make_pw_hash(name, pw, x = None):
     if x is None:
         x = make_salt()
     return "%s|%s" % (hashlib.sha256(name + pw + x).hexdigest(),x)
+
+def random_pw():
+    return ''.join(random.choice(string.ascii_uppercase +
+            string.digits +
+            string.ascii_lowercase) for x in xrange(8))
+
+def gen_state():
+    return ''.join(random.choice(string.ascii_uppercase +
+            string.digits +
+            string.ascii_lowercase) for x in xrange(32))
+
 
 # Validates the input username
 def valid_username(username):
@@ -47,6 +57,7 @@ def valid_statetoken(state, sessionvar):
         return False
     else:
         return True
+
 
 # Checks the validity of all input fields
 def valid(**kwargs):
