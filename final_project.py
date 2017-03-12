@@ -19,6 +19,7 @@ import requests
 
 # Local custom modules
 import authenticate
+from authenticate import valid_statetoken
 from database_setup import Base, CatalogItem, User
 import dbfunctions
 
@@ -55,9 +56,12 @@ def itemList():
 @app.route('/catalog/<string:category>', methods = ['GET'])
 def viewCategory(category):
     items = session.query(CatalogItem).filter_by(category = category).all()
-    categories = session.query(CatalogItem.category).distinct(CatalogItem.category).all()
+    categories = dbfunctions.getUnique(CatalogItem.category)
     cat_name = list(k[0] for k in categories)
-    return render_template('categorylist.html', items = items, category = category, categories = cat_name)
+    return render_template('categorylist.html',
+        items = items,
+        category = category,
+        categories = cat_name)
 
 
 # Displays the selected item
@@ -101,7 +105,7 @@ def signupRestaurant():
                     hashedpw = hashbrown.split('|')[0])
                 session.add(user)
                 session.commit()
-                user_id = session.query(User.id).order_by(desc(User.dt_added)).limit(1).all()
+                user_id = dbfunctions.getDescending(User.id, User.dt_added, 1)
 
                 login_session['userid'] = user_id
                 flash("User created successfully! Welcome %s!" % user_name)
@@ -145,16 +149,20 @@ def loginSite():
             if username:
                 for each in username:
                     salt = each.salt
-                    hashedpw = authenticate.make_pw_hash(user_name, password, salt).split('|')[0]
+                    hashedpw = authenticate.make_pw_hash(user_name,
+                        password,
+                        salt).split('|')[0]
                     try:
-                        user = session.query(User).filter_by(hashedpw = hashedpw).one()
+                        user = session.query(User).filter_by(
+                            hashedpw = hashedpw).one()
                         if user:
                            break
                     except NoResultFound:
                         user = None
 
                 if not user:
-                    flash("The entered password was incorrect. Please try again.")
+                    flash("The entered password was incorrect. \
+                        Please try again.")
                     return render_template('login.html', username = user_name)
             else:
                 flash("User does not exist. Please check your username.")
@@ -217,7 +225,8 @@ def newItem():
         session.add(new_item)
         session.commit()
 
-        item = session.query(CatalogItem).order_by(desc(CatalogItem.dt_added)).limit(1).one()
+        item = dbfunctions.getDescending(CatalogItem, CatalogItem.dt_added, 1)
+        item = item[0]
         flash("New item added!")
 
         return redirect(url_for('viewCatalogItem',
@@ -232,7 +241,8 @@ def editItem(item_id):
     item = session.query(CatalogItem).filter_by(id = item_id).one()
 
     if not item:
-        flash("Invalid item. Please check that you have selected a valid item.")
+        flash("Invalid item. \
+            Please check that you have selected a valid item.")
         return redirect(url_for('viewCatalogItem', item_id = item_id))
 
     if request.method == 'GET':
@@ -260,7 +270,9 @@ def editItem(item_id):
                 category = item.category,
                 item_id = item.id))
 
-        return redirect(url_for('viewCatalogItem', category = item.category, item_id = item.id))
+        return redirect(url_for('viewCatalogItem',
+            category = item.category,
+            item_id = item.id))
 
 
 # Deletes a menu item
@@ -270,7 +282,8 @@ def deleteItem(item_id):
     item = session.query(CatalogItem).filter_by(id = item_id).one()
 
     if not item:
-        flash("Invalid item. Please check that you have selected a valid item.")
+        flash("Invalid item. \
+            Please check that you have selected a valid item.")
         return redirect(url_for('viewCatalogItem', item_id = item_id))
 
     if request.method == 'GET':
@@ -300,7 +313,7 @@ def deleteItem(item_id):
 @app.route('/gconnect', methods=['POST'])
 def gconnect():
     # Validate state token
-    if not authenticate.valid_statetoken(request.args.get('state'), login_session['state']):
+    if not valid_statetoken(request.args.get('state'), login_session['state']):
         response = make_response(json.dumps('Invalid state parameter.'), 401)
         response.headers['Content-Type'] = 'application/json'
         return response
@@ -349,8 +362,8 @@ def gconnect():
     stored_credentials = login_session.get('credentials')
     stored_gplus_id = login_session.get('gplus_id')
     if stored_credentials is not None and gplus_id == stored_gplus_id:
-        response = make_response(json.dumps('Current user is already connected.'),
-                                 200)
+        response = make_response(json.dumps('\
+            Current user is already connected.'), 200)
         response.headers['Content-Type'] = 'application/json'
         return response
 
@@ -383,7 +396,11 @@ def gconnect():
     output += '!</h1>'
     output += '<img src="'
     output += login_session['picture']
-    output += ' " style = "width: 300px; height: 300px;border-radius: 150px;-webkit-border-radius: 150px;-moz-border-radius: 150px;"> '
+    output += ' " style = "width: 300px; \
+    height: 300px; \
+    border-radius: 150px; \
+    -webkit-border-radius: 150px; \
+    -moz-border-radius: 150px;"> '
     flash("you are now logged in as %s" % login_session['username'])
     print "done!"
     return output
@@ -401,7 +418,8 @@ def gdisconnect():
         response.headers['Content-Type'] = 'application/json'
         return response
 
-    url = 'https://accounts.google.com/o/oauth2/revoke?token=%s' % login_session['access_token']
+    url = 'https://accounts.google.com/o/oauth2/revoke?token=%s'
+    url = url  % login_session['access_token']
     h = httplib2.Http()
     result = h.request(url, 'GET')[0]
     print 'result is '
@@ -414,12 +432,11 @@ def gdisconnect():
         del login_session['picture']
 
         flash("Successfully disconnected!")
-        #response = make_response(json.dumps('Successfully disconnected.'), 200)
-        # response.headers['Content-Type'] = 'application/json'
         return redirect(url_for('itemList'))
 
     else:
-        response = make_response(json.dumps('Failed to revoke token for given user.', 400))
+        response = make_response(json.dumps('\
+            Failed to revoke token for given user.', 400))
         response.headers['Content-Type'] = 'application/json'
 
     return response

@@ -1,3 +1,5 @@
+import pdb
+
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
@@ -47,3 +49,17 @@ def getUserByEmail(email):
 # Get distinct object properties
 def getUnique(cls_attr):
     return session.query(cls_attr).distinct(cls_attr).all()
+
+# Get object properties sorted in ascending order
+def getAscending(cls_attr, order, limit = 0):
+    if limit == 0:
+        return session.query(cls_attr).order_by(asc(order)).all()
+    else:
+        return session.query(cls_attr).order_by(asc(order)).limit(limit).all()
+
+# Get object properties sorted in descending order
+def getDescending(cls_attr, order, limit = 0):
+    if limit == 0:
+        return session.query(cls_attr).order_by(desc(order)).all()
+    else:
+        return session.query(cls_attr).order_by(desc(order)).limit(limit).all()
