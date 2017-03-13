@@ -1,0 +1,16 @@
+{
+    "web":{
+        "gplus":{
+            "atoken":"https://www.googleapis.com/oauth2/v1/tokeninfo?access_token=%s",
+            "userinfo":"https://www.googleapis.com/oauth2/v1/userinfo",
+            "revoke":"https://accounts.google.com/o/oauth2/revoke?token=%s"
+        },
+
+        "fbconn":{
+            "atoken":"https://graph.facebook.com/oauth/access_token?grant_type=fb_exchange_token&client_id=%s&client_secret=%s&fb_exchange_token=%s",
+            "nameid":"https://graph.facebook.com/v2.4/me?%s&fields=name,id,email",
+            "picture":"https://graph.facebook.com/v2.4/me/picture?%s&redirect=0&height=200&width=200",
+            "revoke":"https://graph.facebook.com/%s/permissions?access_token=%s"
+        }
+    }
+}
