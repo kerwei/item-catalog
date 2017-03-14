@@ -22,9 +22,11 @@ import authenticate
 from authenticate import valid_statetoken
 from database_setup import Base, CatalogItem, User
 import dbfunctions
+from public_page import public_page
 
 
 app = Flask(__name__)
+app.register_blueprint(public_page)
 
 # Constants
 CLIENT_ID = json.loads(
