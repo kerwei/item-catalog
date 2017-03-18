@@ -7,6 +7,19 @@
 </head>
 
 <body>
+  {% if not userid %}
+    <form action="{{url_for('loginSite')}}" method = 'POST'>
+      <p>Name</p><br>
+      <input type='text' size='30' name='name'><br><br>
+      <p>Password</p><br>
+      <input type='password' size='30' name='password'><br><br>
+      <input type='submit' value='Enter'>
+    </form>
+    <a href="{{url_for('signupSite')}}">Sign Up</a>
+  {% else %}
+
+  {% endif %}
+  <hr><br>
   <!-- MESSAGE FLASHING -->
   {% with messages = get_flashed_messages() %}
     {% if messages %}

@@ -2,7 +2,7 @@
 {% block content %}
 <h1> Edit Item </h1>
 
-<form action="{{url_for('editItem', item_id = item.id)}}" method = 'POST'>
+<form action="{{url_for('private_page.editItem', item_id = item.id)}}" method = 'POST'>
     <p>Name:</p>
     <input type='text' size='30' name='name' value='{{item.name}}'><br>
     <p>Price:</p>
@@ -14,7 +14,7 @@
     <input type='submit' name='task' value='Submit'>
 </form>
 
-<form action="{{url_for('viewCatalogItem', category = item.catgory, item_id = item.id)}}">
+<form action="{{url_for('public_page.viewCatalogItem', category = item.catgory, item_id = item.id)}}">
     <input type='submit' name='task' value='Cancel'>
 </form>
 {% endblock %}

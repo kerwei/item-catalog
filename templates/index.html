@@ -5,7 +5,7 @@
 {% for each in items %}
 <div>
   <ul>
-  <a href="{{url_for('viewCatalogItem', category = each.category, item_id = each.id)}}">
+  <a href="{{url_for('public_page.viewCatalogItem', category = each.category, item_id = each.id)}}">
     <p>{{ '%s (%s)' % (each.name, each.category) }}</p>
   </a>
   </ul>
@@ -17,7 +17,7 @@
 <div>
   {% for cat in categories %}
   <ul>
-    <a href="{{url_for('viewCategory', category = cat)}}"><p>{{cat}}</p></a>
+    <a href="{{url_for('public_page.viewCategory', category = cat)}}"><p>{{cat}}</p></a>
   </ul>
   {% endfor %}
 </div>

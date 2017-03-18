@@ -23,10 +23,11 @@ from authenticate import valid_statetoken
 from database_setup import Base, CatalogItem, User
 import dbfunctions
 from public_page import public_page
-
+from private_page import private_page
 
 app = Flask(__name__)
 app.register_blueprint(public_page)
+app.register_blueprint(private_page)
 
 # Constants
 CLIENT_ID = json.loads(
@@ -40,46 +41,10 @@ fb_ref = json.loads(open('app_links.json', 'r').read())['web']['fbconn']
 # Get a DB session
 session = dbfunctions.getDbSession()
 
-# API request endpoint for the full list of available catalog items
-@app.route('/catalog/JSON')
-def catalogitemJSON():
-    catalogitem = session.query(CatalogItem).all()
-    return jsonify(CatalogItem=[i.serialize for i in catalogitem])
-
-
-# Main landing page. Displays the list of restaurants
-# By categories and by last modified
-@app.route('/', methods = ['GET'])
-def itemList():
-    items = session.query(CatalogItem).order_by(CatalogItem.dt_modded).limit(5)
-    categories = dbfunctions.getUnique(CatalogItem.category)
-    cat_name = list(k[0] for k in categories)
-    return render_template('index.html', items = items, categories = cat_name)
-
-
-# Displays all items of a category
-@app.route('/catalog/<string:category>/items', methods = ['GET'])
-@app.route('/catalog/<string:category>', methods = ['GET'])
-def viewCategory(category):
-    items = session.query(CatalogItem).filter_by(category = category).all()
-    categories = dbfunctions.getUnique(CatalogItem.category)
-    cat_name = list(k[0] for k in categories)
-    return render_template('categorylist.html',
-        items = items,
-        category = category,
-        categories = cat_name)
-
-
-# Displays the selected item
-@app.route('/catalog/<string:category>/items/<int:item_id>', methods = ['GET'])
-def viewCatalogItem(category, item_id):
-    item = session.query(CatalogItem).filter_by(id = item_id).one()
-    return render_template('viewitem.html', item = item)
-
 
 # User Signup
 @app.route('/signup', methods = ['POST', 'GET'])
-def signupRestaurant():
+def signupSite():
     if request.method == 'GET':
         return render_template('signup.html')
 
@@ -116,7 +81,7 @@ def signupRestaurant():
                 login_session['userid'] = user_id
                 flash("User created successfully! Welcome %s!" % user_name)
 
-                return redirect(url_for('itemList'))
+                return redirect(url_for('public_page.itemList'))
             else:
                 flash("The passwords entered do not match. Please re-enter.")
                 return render_template('signup.html', username = user_name)
@@ -176,7 +141,7 @@ def loginSite():
 
             login_session['userid'] = user.id
             flash("Welcome %s!" % user_name)
-            return redirect(url_for('itemList'))
+            return redirect(url_for('public_page.itemList'))
         else:
             flash("Username/password not valid. Please re-enter.")
             return render_template('login.html',
@@ -196,124 +161,7 @@ def logoutSite():
         login_session.pop('userid', None)
         flash("Goodbye %s!" % username)
 
-    return redirect(url_for('itemList'))
-
-
-# Adds a new menu item to a restaurant
-@app.route('/catalog/item/add',
-    methods = ['POST', 'GET'])
-def newItem():
-    if request.method == 'GET':
-        return render_template('newitem.html')
-
-    if request.method == 'POST':
-        if 'userid'  not in login_session:
-            flash("Please log in first to add an item.")
-            return redirect(url_for('loginSite'))
-
-        if len(request.form['name']) == 0:
-            flash("The name of the item is mandatory!")
-            return render_template('newitem.html',
-                name = request.form['name'],
-                price = request.form['price'],
-                category = request.form['category'],
-                description = request.form['description'])
-
-        # user_id = escape(login_session.get('userid'))
-        user_id = request.args.get('userid')
-        user = session.query(User).filter_by(id = int(user_id)).one()
-
-        new_item = CatalogItem(name = request.form['name'],
-            price  = request.form['price'],
-            category  = request.form['category'],
-            description = request.form['description'],
-            user = user)
-        session.add(new_item)
-        session.commit()
-
-        item = dbfunctions.getDescending(CatalogItem, CatalogItem.dt_added, 1)
-        item = item[0]
-        flash("New item added!")
-
-        return redirect(url_for('viewCatalogItem',
-            category = item.category,
-            item_id = item.id))
-
-
-# Edits a single menu item of a restaurant
-@app.route('/catalog/item/<int:item_id>/edit',
-    methods = ['POST', 'GET'])
-def editItem(item_id):
-    item = session.query(CatalogItem).filter_by(id = item_id).one()
-
-    if not item:
-        flash("Invalid item. \
-            Please check that you have selected a valid item.")
-        return redirect(url_for('viewCatalogItem', item_id = item_id))
-
-    if request.method == 'GET':
-        return render_template('edititem.html', item = item)
-
-    if request.method == 'POST':
-        if 'userid'  not in login_session:
-            flash("Please log in first to edit the item.")
-            return redirect(url_for('loginSite'))
-
-        # user_id = escape(login_session['userid'])
-        user_id = request.args.get('userid')
-
-        if user_id == item.user_id:
-            item.name = request.form['name']
-            item.price = request.form['price']
-            item.category = request.form['category']
-            item.description = request.form['description']
-            session.add(item)
-            session.commit()
-            flash("Item saved successfully!")
-        else:
-            flash("You are not authorized to delete this item!")
-            return redirect(url_for('viewCatalogItem',
-                category = item.category,
-                item_id = item.id))
-
-        return redirect(url_for('viewCatalogItem',
-            category = item.category,
-            item_id = item.id))
-
-
-# Deletes a menu item
-@app.route('/catalog/item/<int:item_id>/delete',
-    methods = ['POST', 'GET'])
-def deleteItem(item_id):
-    item = session.query(CatalogItem).filter_by(id = item_id).one()
-
-    if not item:
-        flash("Invalid item. \
-            Please check that you have selected a valid item.")
-        return redirect(url_for('viewCatalogItem', item_id = item_id))
-
-    if request.method == 'GET':
-        return render_template('deleteitem.html', item = item)
-
-    if request.method == 'POST':
-        if 'userid'  not in login_session:
-            flash("Please log in first to delete the item.")
-            return redirect(url_for('loginSite'))
-
-        # user_id = escape(login_session['userid'])
-        user_id = request.args.get('userid')
-
-        if user_id == item.user_id:
-            session.delete(item)
-            session.commit()
-            flash("Item deleted!")
-        else:
-            flash("You are not authorized to delete this item!")
-            return redirect(url_for('viewCatalogItem',
-                category = item.category,
-                item_id = item.id))
-
-        return redirect(url_for('itemList'))
+    return redirect(url_for('public_page.itemList'))
 
 
 @app.route('/gconnect', methods=['POST'])
@@ -427,7 +275,7 @@ def gdisconnect():
         del login_session['picture']
 
         flash("Successfully disconnected!")
-        return redirect(url_for('itemList'))
+        return redirect(url_for('public_page.itemList'))
 
     else:
         response = make_response(json.dumps('\
