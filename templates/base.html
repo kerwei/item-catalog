@@ -7,17 +7,21 @@
 </head>
 
 <body>
-  {% if not userid %}
+  {% if not session %}
     <form action="{{url_for('loginSite')}}" method = 'POST'>
-      <p>Name</p><br>
-      <input type='text' size='30' name='name'><br><br>
-      <p>Password</p><br>
+      <p>Name</p>
+      <input type='text' size='30' name='name'><br>
+      <p>Password</p>
       <input type='password' size='30' name='password'><br><br>
       <input type='submit' value='Enter'>
     </form>
     <a href="{{url_for('signupSite')}}">Sign Up</a>
   {% else %}
-
+    <h1>Welcome, {{session['username']}}!</h1>
+    <img src="{{session['picture']}}" style = "width: 60px;height: 60px;border-radius: 30px;-webkit-border-radius: 30px;-moz-border-radius: 30px;">
+    <form action="{{url_for('logoutSite')}}" method = 'POST'>
+      <input type='submit' value='Logout'>
+    </form>
   {% endif %}
   <hr><br>
   <!-- MESSAGE FLASHING -->

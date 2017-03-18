@@ -1,12 +1,23 @@
 from flask import Blueprint, render_template, abort, jsonify, request, flash, url_for, redirect
 from jinja2 import TemplateNotFound
 
+import authenticate
+import pdb
 import dbfunctions
 from dbfunctions import session
 from database_setup import Base, CatalogItem, User
 
 private_page = Blueprint('private_page', __name__,
                         template_folder='templates')
+
+
+crsf_token = request.args.get('crsf_token')
+username = requet.args.get('username')
+userid = request.args.get('userid')
+csrf_chip = authenticate.roast_chip(str(userid) + username)
+
+if csrf_chip != csrf_token:
+    pass
 
 
 # Adds a new menu item to a restaurant

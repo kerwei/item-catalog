@@ -76,9 +76,9 @@ def signupSite():
                     hashedpw = hashbrown.split('|')[0])
                 session.add(user)
                 session.commit()
-                user_id = dbfunctions.getDescending(User.id, User.dt_added, 1)
+                new_user = dbfunctions.getDescending(User, User.dt_added, 1)
 
-                login_session['userid'] = user_id
+                login_session['userid'] = new_user.id
                 flash("User created successfully! Welcome %s!" % user_name)
 
                 return redirect(url_for('public_page.itemList'))
@@ -139,7 +139,12 @@ def loginSite():
                 flash("User does not exist. Please check your username.")
                 return render_template('login.html', username = user_name)
 
+            csrf_token = authenticate.roast_chip(str(user.id) + user.name)
             login_session['userid'] = user.id
+            login_session['username'] = user.name
+            login_session['picture'] = user.picture
+            login_session['email'] = user.email
+            login_session['csrf_token'] = csrf_token
             flash("Welcome %s!" % user_name)
             return redirect(url_for('public_page.itemList'))
         else:
