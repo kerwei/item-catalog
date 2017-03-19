@@ -8,6 +8,7 @@ import string
 from flask import Flask
 from flask import request, render_template, redirect, url_for, flash, jsonify
 from flask import session as login_session, escape, make_response
+from flask.ext.seasurf import SeaSurf
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.orm.exc import NoResultFound
@@ -28,6 +29,7 @@ from private_page import private_page
 app = Flask(__name__)
 app.register_blueprint(public_page)
 app.register_blueprint(private_page)
+csrf = SeaSurf(app)
 
 # Constants
 CLIENT_ID = json.loads(
@@ -94,6 +96,7 @@ def signupSite():
 
 
 # User Login
+@csrf.exempt
 @app.route('/login', methods = ['POST', 'GET'])
 def loginSite():
     if request.method == 'GET':
@@ -160,10 +163,12 @@ def loginSite():
 def logoutSite():
     if 'userid' in login_session:
         # user_id = escape(login_session.get('userid'))
-        user_id = request.args.get('userid')
+        user_id = login_session['userid']
         username = session.query(User.name).filter_by(id = int(user_id)).one()
 
-        login_session.pop('userid', None)
+        for key in login_session:
+            login_session.pop(key, None)
+
         flash("Goodbye %s!" % username)
 
     return redirect(url_for('public_page.itemList'))

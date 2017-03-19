@@ -11,6 +11,7 @@
     <input type='text' size='30' name='category' value='{{item.category}}'><br>
     <p>Description:</p>
     <input type='text' size='30' name='description' value='{{item.description}}'><br><br>
+    <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
     <input type='submit' name='task' value='Submit'>
 </form>
 

@@ -12,6 +12,7 @@
   <input type='text' size='30' name='category' value='{{category}}'><br>
   <p>Description:</p>
   <input type='text' size='30' name='description' value='{{description}}'><br><br>
+  <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
   <input type='submit' value='Create'>
   <input type='submit' value='Cancel'>
 </form>
@@ -25,6 +26,7 @@
   <input type='text' size='30' name='category'><br>
   <p>Description:</p>
   <input type='text' size='30' name='description'><br><br>
+  <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
   <input type='submit' value='Create'>
   <input type='submit' value='Cancel'>
 </form>

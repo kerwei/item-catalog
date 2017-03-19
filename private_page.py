@@ -1,5 +1,6 @@
 from functools import wraps
 from flask import Blueprint, render_template, abort, jsonify, request, flash, url_for, redirect
+from flask import session as login_session
 from jinja2 import TemplateNotFound
 
 import authenticate
@@ -12,26 +13,25 @@ private_page = Blueprint('private_page', __name__,
                         template_folder='templates')
 
 
-def crsf_def(f):
-    @wraps(f)
-    def decorated_function(*args, **kwargs):
-        pdb.set_trace()
-        # crsf_token = request.args.get('crsf_token')
-        # username = requet.args.get('username')
-        # userid = request.args.get('userid')
-        # csrf_chip = authenticate.roast_chip(str(userid) + username)
+# def crsf_def(f):
+#     @wraps(f)
+#     def decorated_function(*args, **kwargs):
+#         pdb.set_trace()
+#         # crsf_token = request.args.get('crsf_token')
+#         # username = requet.args.get('username')
+#         # userid = request.args.get('userid')
+#         # csrf_chip = authenticate.roast_chip(str(userid) + username)
 
-        # if csrf_chip != csrf_token:
-        #     return redirect(url_for('loginSite'))
-        return f(*args, **kwargs)
+#         # if csrf_chip != csrf_token:
+#         #     return redirect(url_for('loginSite'))
+#         return f(*args, **kwargs)
 
-    return decorated_function
+#     return decorated_function
 
 
 # Adds a new menu item to a restaurant
 @private_page.route('/catalog/item/add',
     methods = ['POST', 'GET'])
-@crsf_def
 def newItem():
     if request.method == 'GET':
         return render_template('newitem.html')

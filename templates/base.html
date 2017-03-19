@@ -19,7 +19,7 @@
   {% else %}
     <h1>Welcome, {{session['username']}}!</h1>
     <img src="{{session['picture']}}" style = "width: 60px;height: 60px;border-radius: 30px;-webkit-border-radius: 30px;-moz-border-radius: 30px;">
-    <form action="{{url_for('logoutSite')}}" method = 'POST'>
+    <form action="{{url_for('logoutSite')}}" method = 'GET'>
       <input type='submit' value='Logout'>
     </form>
   {% endif %}
