@@ -4,6 +4,11 @@
 <div>
   <h1>{{item.name}}</h1>
   <p>{{item.description}}</p>
+  <p>{{item.user.name}}</p>
 </div>
 
+{% if session['userid'] == item.user.id %}
+  <a href="{{url_for('private_page.editItem', item_id = item.id)}}">Edit</a>
+  <a href="{{url_for('private_page.deleteItem', item_id = item.id)}}">Delete</a>
+{% endif %}
 {% endblock %}

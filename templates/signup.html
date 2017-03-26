@@ -2,7 +2,7 @@
 {% block content %}
 <h1> User Signup </h1>
 
-<form action="{{url_for('signupSite')}}" method = 'POST'>
+<form action="{{url_for('authenticate_page.signupSite')}}" method = 'POST'>
 <p>Name</p>
 
 {% if err_username %}
@@ -36,5 +36,27 @@
 <br><br>
 <input type='submit' value='Enter'>
 </form>
+
+<!-- GOOGLE PLUS SIGN IN BUTTON-->
+<div id="signInButton">
+  <span class="g-signin"
+    data-scope="openid email"
+    data-clientid="402002396733-qegi73oe4r8j0ara2q2ccu16vj5h2g71.apps.googleusercontent.com"
+    data-redirecturi="postmessage"
+    data-accesstype="offline"
+    data-cookiepolicy="single_host_origin"
+    data-callback="signInCallback"
+    data-approvalprompt="force">
+  </span>
+</div>
+
+<!-- FACEBOOK CONNECT SIGN IN BUTTON-->
+<button>
+    <fb:login-button scope="public_profile,email" onlogin="sendTokenToServer();">
+    <a href='javascript:sendTokenToServer()'>Login with Facebook</a>
+    </fb:login-button>
+</button>
+
+<div id="result"></div>
 
 {% endblock %}

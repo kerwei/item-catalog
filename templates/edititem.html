@@ -15,7 +15,5 @@
     <input type='submit' name='task' value='Submit'>
 </form>
 
-<form action="{{url_for('public_page.viewCatalogItem', category = item.catgory, item_id = item.id)}}">
-    <input type='submit' name='task' value='Cancel'>
-</form>
+<a href="{{url_for('public_page.viewCatalogItem', category = item.category, item_id = item.id)}}">Cancel</a>
 {% endblock %}

@@ -1,9 +1,9 @@
 import pdb
 
-from sqlalchemy import create_engine
+from sqlalchemy import create_engine, desc
 from sqlalchemy.orm import sessionmaker
 
-import authenticate
+import helpers
 from database_setup import Base, User
 
 

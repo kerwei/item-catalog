@@ -7,23 +7,50 @@
 </head>
 
 <body>
-  {% if not session %}
-    <form action="{{url_for('loginSite')}}" method = 'POST'>
-      <p>Name</p>
-      <input type='text' size='30' name='name'><br>
-      <p>Password</p>
-      <input type='password' size='30' name='password'><br><br>
-      <input type='submit' value='Enter'>
-    </form>
-    <a href="{{url_for('signupSite')}}">Sign Up</a>
-  {% else %}
-    <h1>Welcome, {{session['username']}}!</h1>
-    <img src="{{session['picture']}}" style = "width: 60px;height: 60px;border-radius: 30px;-webkit-border-radius: 30px;-moz-border-radius: 30px;">
-    <form action="{{url_for('logoutSite')}}" method = 'GET'>
-      <input type='submit' value='Logout'>
-    </form>
-  {% endif %}
-  <hr><br>
+
+  {% if request.path != "/login" and request.path != "/signup" %}
+    {% if not session['username'] %}
+      <form action="{{url_for('loginSite')}}" method = 'POST'>
+        <p>Name</p>
+        <input type='text' size='30' name='name'><br>
+        <p>Password</p>
+        <input type='password' size='30' name='password'><br><br>
+        <input type='submit' value='Sign In'>
+      </form>
+      <a href="{{url_for('authenticate_page.signupSite')}}">Sign Up</a>
+
+      <!-- GOOGLE PLUS SIGN IN BUTTON-->
+      <div id="signInButton">
+        <span class="g-signin"
+          data-scope="openid email"
+          data-clientid="402002396733-qegi73oe4r8j0ara2q2ccu16vj5h2g71.apps.googleusercontent.com"
+          data-redirecturi="postmessage"
+          data-accesstype="offline"
+          data-cookiepolicy="single_host_origin"
+          data-callback="signInCallback"
+          data-approvalprompt="force">
+        </span>
+      </div>
+
+      <!-- FACEBOOK CONNECT SIGN IN BUTTON-->
+      <button>
+          <fb:login-button scope="public_profile,email" onlogin="sendTokenToServer();">
+          <a href='javascript:sendTokenToServer()'>Login with Facebook</a>
+          </fb:login-button>
+      </button>
+
+      <div id="result"></div>
+
+    {% else %}
+      <h1>Welcome, {{session['username']}}!</h1>
+      <img src="{{session['picture']}}" style = "width: 60px;height: 60px;border-radius: 30px;-webkit-border-radius: 30px;-moz-border-radius: 30px;">
+      <form action="{{url_for('authenticate_page.logoutSite')}}" method = 'GET'>
+        <input type='submit' value='Logout'>
+      </form>
+    {% endif %}
+    <hr><br>
+    {% endif %}
+
   <!-- MESSAGE FLASHING -->
   {% with messages = get_flashed_messages() %}
     {% if messages %}
@@ -36,7 +63,7 @@
   {% endwith %}
 
   {% block content %}
-
+  <!-- PAGE CONTENTS -->
   {% endblock %}
 </body>
 
