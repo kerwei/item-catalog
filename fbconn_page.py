@@ -1,6 +1,6 @@
 import json
 
-from flask import Blueprint, render_template, abort, jsonify, url_for, redirect
+from flask import Blueprint, render_template, abort, jsonify, url_for, redirect, request
 from jinja2 import TemplateNotFound
 from oauth2client.client import flow_from_clientsecrets
 from oauth2client.client import FlowExchangeError

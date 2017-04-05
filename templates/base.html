@@ -76,7 +76,9 @@ function signInCallback(authResult) {
     // Send the one-time-use code to the server, if the server responds, write a 'login successful' message to the web page and then redirect back to the main restaurants page
     $.ajax({
       type: 'POST',
-      url: '/gconnect?state={{STATE}}',
+      // url: '/gconnect?state={{STATE}}',
+      url: '/gconnect',
+      headers: {'X-CSRFToken':'{{ csrf_token() }}'},
       processData: false,
       data: authResult['code'],
       contentType: 'application/octet-stream; charset=utf-8',
@@ -128,6 +130,7 @@ function sendTokenToServer() {
     url: '/fbconnect?state={{STATE}}',
     processData: false,
     data: access_token,
+    headers: {'X-CSRFToken':'{{ csrf_token() }}'},
     contentType: 'application/octet-stream; charset=utf-8',
     success: function(result) {
       // Handle or verify the server response if necessary.

@@ -69,6 +69,12 @@ def signupSite():
 # Logs out from the site
 @authenticate_page.route('/logout', methods = ['GET'])
 def logoutSite():
+    if 'auth_type' not in login_session:
+        if 'gplus_id' in login_session:
+            return redirect(url_for('gconn_page.gdisconnect'))
+        else:
+            return redirect(url_for('fbconn_page.fbdisconnect'))
+
     if 'userid' in login_session:
         # user_id = escape(login_session.get('userid'))
         user_id = login_session['userid']

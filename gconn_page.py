@@ -1,6 +1,10 @@
+import httplib2
 import json
+import pdb
+import requests
 
-from flask import Blueprint, render_template, abort, jsonify, url_for, redirect
+from flask import Blueprint, render_template, abort, jsonify, url_for, redirect, request, flash
+from flask import session as login_session
 from jinja2 import TemplateNotFound
 from oauth2client.client import flow_from_clientsecrets
 from oauth2client.client import FlowExchangeError
@@ -8,6 +12,8 @@ from oauth2client.client import FlowExchangeError
 import dbfunctions
 from dbfunctions import session
 from database_setup import Base, CatalogItem, User
+import helpers
+from helpers import valid_statetoken
 
 gconn_page = Blueprint('gconn_page', __name__,
                         template_folder='templates')
@@ -21,10 +27,10 @@ CLIENT_ID = json.loads(
 @gconn_page.route('/gconnect', methods=['POST'])
 def gconnect():
     # Validate state token
-    if not valid_statetoken(request.args.get('state'), login_session['state']):
-        response = make_response(json.dumps('Invalid state parameter.'), 401)
-        response.headers['Content-Type'] = 'application/json'
-        return response
+    # if not valid_statetoken(request.args.get('state'), login_session['state']):
+    #     response = make_response(json.dumps('Invalid state parameter.'), 401)
+    #     response.headers['Content-Type'] = 'application/json'
+    #     return response
     # Obtain authorization code
     code = request.data
 
@@ -32,6 +38,7 @@ def gconnect():
         # Upgrade the authorization code into a credentials object
         oauth_flow = flow_from_clientsecrets('client_secrets.json', scope='')
         oauth_flow.redirect_uri = 'postmessage'
+        # pdb.set_trace()
         credentials = oauth_flow.step2_exchange(code)
     except FlowExchangeError:
         response = make_response(
@@ -92,16 +99,16 @@ def gconnect():
     login_session['email'] = data['email']
 
     # see if user exists
-    user_gp = helpers.getUserByEmail(login_session['email'])
+    user_gp = dbfunctions.getUserByEmail(login_session['email'])
     if not user_gp:
-        user_id = helpers.createUser(login_session)
-    login_session['user_id'] = user_id
+        user_id = dbfunctions.createUser(login_session)
+        login_session['user_id'] = user_id
 
     welcome = open('templates/oauth_welcome.html').read()
     welcome = welcome % (login_session['username'], login_session['picture'])
     flash("you are now logged in as %s" % login_session['username'])
-    print "done!"
-    return output
+
+    return welcome
 
 
 @gconn_page.route('/gdisconnect')

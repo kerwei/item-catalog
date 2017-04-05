@@ -21,8 +21,8 @@ def getDbSession():
 
 # Creates a new user record from OAuth sign-ins. Returns the newly created id
 def createUser(login_session):
-    temp_pw = random_pw()
-    hashbrown = make_pw_hash(login_session['username'], temp_pw)
+    temp_pw = helpers.random_pw()
+    hashbrown = helpers.make_pw_hash(login_session['username'], temp_pw)
     newUser = User(name=login_session['username'],
         email=login_session['email'],
         picture=login_session['picture'],

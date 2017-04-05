@@ -97,7 +97,7 @@ def loginSite():
             login_session['username'] = user.name
             login_session['picture'] = user.picture
             login_session['email'] = user.email
-            login_session['csrf_token'] = csrf_token
+            login_session['auth_type'] = "local"
             flash("Welcome %s!" % user_name)
             return redirect(url_for('public_page.itemList'))
         else:
