@@ -21,6 +21,7 @@ def getDbSession():
 
 # Creates a new user record from OAuth sign-ins. Returns the newly created id
 def createUser(login_session):
+    # Generates a proxy password to satisfy the table schema
     temp_pw = helpers.random_pw()
     hashbrown = helpers.make_pw_hash(login_session['username'], temp_pw)
     newUser = User(name=login_session['username'],

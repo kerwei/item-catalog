@@ -27,14 +27,14 @@ from authenticate_page import authenticate_page
 from gconn_page import gconn_page
 from fbconn_page import fbconn_page
 
-
+# Starts the application and register the blueprints
 app = Flask(__name__)
 app.register_blueprint(public_page)
 app.register_blueprint(authenticate_page)
 app.register_blueprint(private_page)
 app.register_blueprint(gconn_page)
 app.register_blueprint(fbconn_page)
-
+# CSRF is handled via Flask-SeaSurf
 csrf = SeaSurf(app)
 
 # Constants
@@ -42,28 +42,31 @@ APPLICATION_NAME = "Item Catalog App"
 
 
 # User Login
+# CSRF not relevant prior to user login
 @csrf.exempt
 @app.route('/login', methods = ['POST', 'GET'])
 def loginSite():
     if request.method == 'GET':
+        # Redirects the user back to the main landing page if he/she is already
+        # logged in
         if 'userid' in login_session:
             flash("You are already logged in!")
             return redirect(url_for('public_page.itemList'))
 
-        login_session['state'] = helpers.gen_state()
-        return render_template('login.html', STATE = login_session['state'])
+        return render_template('login.html')
 
     if request.method == 'POST':
+        # Retrieves the form details
         user_name = request.form['name']
         password = request.form['password']
-
+        # Checks that the required fields are not empty
         nan_empty = helpers.nempty(username = user_name,
             password = password)
-
+        # Throws the warning message if one of the fields is empty
         if nan_empty is not True:
             flash("Please ensure all fields are filled before submitting.")
             return render_template('login.html', nan_message = nan_empty)
-
+        # Checks that the entered characters are valid
         is_valid = helpers.valid(username = user_name,
             password = password)
 
@@ -71,12 +74,20 @@ def loginSite():
             username = session.query(User).filter_by(name = user_name).all()
 
             if username:
+                # Identical user names permitted by the site. Test the
+                # validity of the entered password by looping through the salt,
+                # generating the hash for each combination and check against the
+                # hashedpw stored in the db
                 for each in username:
                     salt = each.salt
                     hashedpw = helpers.make_pw_hash(user_name,
                         password,
                         salt).split('|')[0]
                     try:
+                        # Probably unecessary to check the username again over
+                        # here given that the hash is generated from the
+                        # username as well. Only danger left is when two
+                        # users have the same name and password combination
                         user = session.query(User).filter_by(
                             hashedpw = hashedpw).one()
                         if user:

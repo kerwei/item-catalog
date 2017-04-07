@@ -1,6 +1,9 @@
 import json
+import httplib2
+import pdb
 
 from flask import Blueprint, render_template, abort, jsonify, url_for, redirect, request
+from flask import session as login_session
 from jinja2 import TemplateNotFound
 from oauth2client.client import flow_from_clientsecrets
 from oauth2client.client import FlowExchangeError
@@ -19,10 +22,10 @@ fb_ref = json.loads(open('app_links.json', 'r').read())['web']['fbconn']
 
 @fbconn_page.route('/fbconnect', methods=['POST'])
 def fbconnect():
-    if request.args.get('state') != login_session['state']:
-        response = make_response(json.dumps('Invalid state parameter.'), 401)
-        response.headers['Content-Type'] = 'application/json'
-        return response
+    # if request.args.get('state') != login_session['state']:
+    #     response = make_response(json.dumps('Invalid state parameter.'), 401)
+    #     response.headers['Content-Type'] = 'application/json'
+    #     return response
     access_token = request.data
 
     app_id = json.loads(open('fb_client_secrets.json', 'r').read())[
@@ -43,6 +46,8 @@ def fbconnect():
     h = httplib2.Http()
     result = h.request(url, 'GET')[1]
     data = json.loads(result)
+    # pdb.set_trace()
+    for k, v in data: print k
     login_session['provider'] = 'facebook'
     login_session['username'] = data["name"]
     login_session['email'] = data["email"]
