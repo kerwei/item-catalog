@@ -7,9 +7,9 @@
         },
 
         "fbconn":{
-            "atoken":"https://graph.facebook.com/oauth/access_token?grant_type=fb_exchange_token&client_id=%s&client_secret=%s&fb_exchange_token=%s",
-            "nameid":"https://graph.facebook.com/v2.4/me?%s&fields=name,id,email",
-            "picture":"https://graph.facebook.com/v2.4/me/picture?%s&redirect=0&height=200&width=200",
+            "atoken":"https://graph.facebook.com/v2.8/oauth/access_token?grant_type=fb_exchange_token&client_id=%s&client_secret=%s&fb_exchange_token=%s",
+            "nameid":"https://graph.facebook.com/v2.8/me?access_token=%s&fields=name,id,email",
+            "picture":"https://graph.facebook.com/v2.8/%s/picture?redirect=0&height=200&width=200",
             "revoke":"https://graph.facebook.com/%s/permissions?access_token=%s"
         }
     }

@@ -128,7 +128,7 @@ function sendTokenToServer() {
    $.ajax({
     type: 'POST',
     //url: '/fbconnect?state={{STATE}}',
-    url: '/fbconnect',    
+    url: '/fbconnect',
     processData: false,
     data: access_token,
     headers: {'X-CSRFToken':'{{ csrf_token() }}'},
@@ -138,7 +138,7 @@ function sendTokenToServer() {
       if (result) {
         $('#result').html('Login Successful!</br>'+ result + '</br>Redirecting...')
        setTimeout(function() {
-        window.location.href = "/restaurant";
+        window.location.href = "/";
        }, 4000);
 
     } else {

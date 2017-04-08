@@ -4,7 +4,7 @@ import pdb
 import requests
 
 from flask import Blueprint, render_template, abort, jsonify, url_for, redirect, request, flash
-from flask import session as login_session
+from flask import session as login_session, make_response
 from jinja2 import TemplateNotFound
 from oauth2client.client import flow_from_clientsecrets
 from oauth2client.client import FlowExchangeError
@@ -103,6 +103,8 @@ def gconnect():
     if not user_gp:
         user_id = dbfunctions.createUser(login_session)
         login_session['user_id'] = user_id
+    else:
+        login_session['user_id'] = user_gp.id
 
     welcome = open('templates/oauth_welcome.html').read()
     welcome = welcome % (login_session['username'], login_session['picture'])
@@ -126,8 +128,7 @@ def gdisconnect():
     url = gplus_ref['revoke'] % login_session['access_token']
     h = httplib2.Http()
     result = h.request(url, 'GET')[0]
-    print 'result is '
-    print result
+
     if result['status'] == '200':
         del login_session['access_token']
         del login_session['gplus_id']
