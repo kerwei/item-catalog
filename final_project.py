@@ -34,14 +34,14 @@ app.register_blueprint(authenticate_page)
 app.register_blueprint(private_page)
 app.register_blueprint(gconn_page)
 app.register_blueprint(fbconn_page)
-# CSRF is handled via Flask-SeaSurf
+# CSRF is taken care of by Flask-SeaSurf
 csrf = SeaSurf(app)
-
-# Constants
-APPLICATION_NAME = "Item Catalog App"
 
 
 # User Login
+# The module is placed here merely because it needs to invoke the csrf exempt
+# function. TODO: Propagate the csrf object through to the submodules and move
+# the login function to the authenticate_page module.
 # CSRF not relevant prior to user login
 @csrf.exempt
 @app.route('/login', methods = ['POST', 'GET'])
@@ -103,6 +103,7 @@ def loginSite():
                 flash("User does not exist. Please check your username.")
                 return render_template('login.html', username = user_name)
 
+            # Sets the login session if login is successful
             csrf_token = helpers.roast_chip(str(user.id) + user.name)
             login_session['userid'] = user.id
             login_session['username'] = user.name
