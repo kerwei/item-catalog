@@ -1,26 +1,26 @@
 # Standard Library
-import pdb
+import pdb  # For debugging
 
 # Third party modules
 from flask import Flask
-from flask import request, render_template, redirect, url_for, flash, jsonify
+from flask import request, render_template, redirect, url_for, flash
 from flask import session as login_session
 from flask.ext.seasurf import SeaSurf
-from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker
-from sqlalchemy.orm.exc import NoResultFound
-from sqlalchemy import desc
-from oauth2client.client import flow_from_clientsecrets
-from oauth2client.client import FlowExchangeError
-import httplib2
-import requests
+# from sqlalchemy import create_engine
+# from sqlalchemy.orm import sessionmaker
+# from sqlalchemy.orm.exc import NoResultFound
+# # from sqlalchemy import desc
+# from oauth2client.client import flow_from_clientsecrets
+# from oauth2client.client import FlowExchangeError
+# import httplib2
+# import requests
 
 # Local custom modules
 import helpers
-from helpers import valid_statetoken
-from database_setup import Base, CatalogItem, User
-import dbfunctions
+# from helpers import valid_statetoken
+from database_setup import Base, User
 from dbfunctions import session
+# Blueprints
 from public_page import public_page
 from private_page import private_page
 from authenticate_page import authenticate_page

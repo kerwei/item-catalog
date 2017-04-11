@@ -11,6 +11,10 @@ Base = declarative_base()
 
 
 class User(Base):
+    '''
+    Schema of registered users. Users logging in via OAuth2 are registered
+    automatically.
+    '''
     __tablename__ = 'user'
 
     id = Column(Integer, primary_key = True)
@@ -19,10 +23,15 @@ class User(Base):
     picture = Column(String(1000), nullable = True)
     salt = Column(String(250), nullable = False)
     hashedpw = Column(String(250), nullable = False)
-    dt_added = Column(DateTime, nullable = False, default = datetime.datetime.now())
+    dt_added = Column(DateTime, 
+        nullable = False, 
+        default = datetime.datetime.now())
 
 
 class CatalogItem(Base):
+    '''
+    Schema of items created on the application.
+    '''
     __tablename__ = 'catalog_item'
 
     id = Column(Integer, primary_key = True)
@@ -30,11 +39,17 @@ class CatalogItem(Base):
     price = Column(String(8))
     category = Column(String(250))
     description = Column(String(250))
-    dt_added = Column(DateTime, nullable = False, default = datetime.datetime.now())
-    dt_modded = Column(DateTime, nullable = False, default = datetime.datetime.now(), onupdate = datetime.datetime.now())
+    dt_added = Column(DateTime, 
+        nullable = False, 
+        default = datetime.datetime.now())
+    dt_modded = Column(DateTime, 
+        nullable = False, 
+        default = datetime.datetime.now(), 
+        onupdate = datetime.datetime.now())
     user_id = Column(Integer, ForeignKey('user.id'))
     user = relationship(User)
 
+    # Serialization function for JSON API requests
     @property
     def serialize(self):
         return {

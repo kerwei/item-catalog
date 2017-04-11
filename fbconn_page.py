@@ -5,7 +5,7 @@ import pdb
 from flask import Blueprint, render_template, url_for, redirect
 from flask import abort, jsonify, request, flash
 from flask import session as login_session
-from jinja2 import TemplateNotFound
+# from jinja2 import TemplateNotFound
 from oauth2client.client import flow_from_clientsecrets
 from oauth2client.client import FlowExchangeError
 
@@ -13,11 +13,11 @@ import dbfunctions
 from dbfunctions import session
 from database_setup import Base, CatalogItem, User
 
-# Sets the blueprint
+
 fbconn_page = Blueprint('fbconn_page', __name__,
                         template_folder='templates')
 
-# Load API endpoints for FB Connect
+# Load the API endpoints for FB Connect
 fb_ref = json.loads(open('app_links.json', 'r').read())['web']['fbconn']
 
 
@@ -80,7 +80,7 @@ def fbdisconnect():
     # The access token must me included to successfully logout
     access_token = login_session['token']
 
-    # Invokes the logout API call
+    # Invokes the logout API call and clears the login session
     logout_data = getapidata(fb_ref['revoke'], fb_id, access_token)
     del login_session['token']
     del login_session['facebook_id']

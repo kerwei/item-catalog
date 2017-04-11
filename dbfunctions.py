@@ -34,10 +34,12 @@ def createUser(login_session):
     user = session.query(User).filter_by(email=login_session['email']).one()
     return user.id
 
+
 # Get user by id
 def getUserById(user_id):
     user = session.query(User).filter_by(id=user_id).one()
     return user
+
 
 # Get user by email
 def getUserByEmail(email):
@@ -47,9 +49,11 @@ def getUserByEmail(email):
     except:
         return None
 
+
 # Get distinct object properties
 def getUnique(cls_attr):
     return session.query(cls_attr).distinct(cls_attr).all()
+
 
 # Get object properties sorted in ascending order
 def getAscending(cls_attr, order, limit = 0):
@@ -57,6 +61,7 @@ def getAscending(cls_attr, order, limit = 0):
         return session.query(cls_attr).order_by(asc(order)).all()
     else:
         return session.query(cls_attr).order_by(asc(order)).limit(limit).all()
+
 
 # Get object properties sorted in descending order
 def getDescending(cls_attr, order, limit = 0):

@@ -3,17 +3,17 @@ import json
 import pdb
 import requests
 
-from flask import Blueprint, render_template, abort, jsonify, url_for, redirect, request, flash
-from flask import session as login_session, make_response
-from jinja2 import TemplateNotFound
+from flask import Blueprint, render_template, url_for, redirect, request
+from flask import abort, jsonify, flash, make_response
+from flask import session as login_session
+#from jinja2 import TemplateNotFound
 from oauth2client.client import flow_from_clientsecrets
 from oauth2client.client import FlowExchangeError
 
 import dbfunctions
 from dbfunctions import session
-from database_setup import Base, CatalogItem, User
-import helpers
-from helpers import valid_statetoken
+from database_setup import Base, User
+
 
 gconn_page = Blueprint('gconn_page', __name__,
                         template_folder='templates')
@@ -24,21 +24,16 @@ gplus_ref = json.loads(open('app_links.json', 'r').read())['web']['gplus']
 CLIENT_ID = json.loads(
     open('client_secrets.json', 'r').read())['web']['client_id']
 
+
+# Connects to Google Plus via OAuth2
 @gconn_page.route('/gconnect', methods=['POST'])
 def gconnect():
-    # Validate state token
-    # if not valid_statetoken(request.args.get('state'), login_session['state']):
-    #     response = make_response(json.dumps('Invalid state parameter.'), 401)
-    #     response.headers['Content-Type'] = 'application/json'
-    #     return response
-    # Obtain authorization code
     code = request.data
 
     try:
         # Upgrade the authorization code into a credentials object
         oauth_flow = flow_from_clientsecrets('client_secrets.json', scope='')
         oauth_flow.redirect_uri = 'postmessage'
-        # pdb.set_trace()
         credentials = oauth_flow.step2_exchange(code)
     except FlowExchangeError:
         response = make_response(
@@ -73,6 +68,7 @@ def gconnect():
         response.headers['Content-Type'] = 'application/json'
         return response
 
+    # Checks if the user is already logged in
     stored_credentials = login_session.get('credentials')
     stored_gplus_id = login_session.get('gplus_id')
     if stored_credentials is not None and gplus_id == stored_gplus_id:
@@ -90,15 +86,13 @@ def gconnect():
     userinfo_url = gplus_ref['userinfo']
     params = {'access_token': credentials.access_token, 'alt': 'json'}
     answer = requests.get(userinfo_url, params=params)
-
-    # Add code to add user to local db if user does not exist
     data = answer.json()
-
+    # Set login session
     login_session['username'] = data['name']
     login_session['picture'] = data['picture']
     login_session['email'] = data['email']
 
-    # see if user exists
+    # See if user exists. If not, add the user to the database.
     user_gp = dbfunctions.getUserByEmail(login_session['email'])
     if not user_gp:
         user_id = dbfunctions.createUser(login_session)
@@ -112,23 +106,22 @@ def gconnect():
 
     return welcome
 
-
+# Disconnects from Google Plus
 @gconn_page.route('/gdisconnect')
 def gdisconnect():
     access_token = login_session['access_token']
-    print 'In gdisconnect access token is %s', access_token
-    print 'User name is: '
-    print login_session['username']
+    # If user is not connected
     if access_token is None:
         print 'Access Token is None'
         response = make_response(json.dumps('Current user not connected.'), 401)
         response.headers['Content-Type'] = 'application/json'
         return response
-
+    # Invokes the logout API end point
     url = gplus_ref['revoke'] % login_session['access_token']
     h = httplib2.Http()
     result = h.request(url, 'GET')[0]
 
+    # Clears the login session
     if result['status'] == '200':
         del login_session['access_token']
         del login_session['gplus_id']
@@ -145,3 +138,4 @@ def gdisconnect():
         response.headers['Content-Type'] = 'application/json'
 
     return response
+    

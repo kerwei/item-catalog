@@ -1,9 +1,9 @@
 from flask import Blueprint, render_template, abort, jsonify, url_for, redirect
-from jinja2 import TemplateNotFound
+# from jinja2 import TemplateNotFound
 
 import dbfunctions
 from dbfunctions import session
-from database_setup import Base, CatalogItem, User
+from database_setup import Base, CatalogItem
 
 public_page = Blueprint('public_page', __name__,
                         template_folder='templates')
@@ -40,7 +40,8 @@ def viewCategory(category):
 
 
 # Displays the selected item
-@public_page.route('/catalog/<string:category>/items/<int:item_id>', methods = ['GET'])
+@public_page.route('/catalog/<string:category>/items/<int:item_id>', 
+    methods = ['GET'])
 def viewCatalogItem(category, item_id):
     item = session.query(CatalogItem).filter_by(id = item_id).one()
     return render_template('viewitem.html', item = item)

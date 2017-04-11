@@ -1,11 +1,13 @@
-from flask import Blueprint, render_template, abort, jsonify, url_for, redirect, flash, request
+from flask import Blueprint, render_template, url_for, redirect, request
+from flask import abort, jsonify, flash
 from flask import session as login_session
 from flask.ext.seasurf import SeaSurf
-from jinja2 import TemplateNotFound
+# from jinja2 import TemplateNotFound
 
 import dbfunctions
 from dbfunctions import session
 from database_setup import Base, CatalogItem, User
+
 
 authenticate_page = Blueprint('authenticate_page', __name__,
                         template_folder='templates')
