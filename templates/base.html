@@ -43,7 +43,9 @@
 
     {% else %}
       <h1>Welcome, {{session['username']}}!</h1>
-      <img src="{{session['picture']}}" style = "width: 60px;height: 60px;border-radius: 30px;-webkit-border-radius: 30px;-moz-border-radius: 30px;">
+      {% if session['picture'] %}
+        <img src="{{session['picture']}}" style = "width: 60px;height: 60px;border-radius: 30px;-webkit-border-radius: 30px;-moz-border-radius: 30px;">
+      {% endif %}
       <form action="{{url_for('authenticate_page.logoutSite')}}" method = 'GET'>
         <input type='submit' value='Logout'>
       </form>
