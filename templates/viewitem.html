@@ -7,7 +7,7 @@
   <p>{{item.user.name}}</p>
 </div>
 
-{% if session['userid'] == item.user.id %}
+{% if session['user_id'] == item.user.id %}
   <a href="{{url_for('private_page.editItem', item_id = item.id)}}">Edit</a>
   <a href="{{url_for('private_page.deleteItem', item_id = item.id)}}">Delete</a>
 {% endif %}

@@ -26,6 +26,13 @@ def catalogitemJSON():
     return jsonify(CatalogItem=[i.serialize for i in catalogitem])
 
 
+# API request endpoint for single items
+@public_page.route('/catalog/<string:category>/items/<int:item_id>/JSON')
+def singleitemJSON():
+    catalogitem = session.query(CatalogItem).filter_by(id = item_id).one()
+    return jsonify(CatalogItem=[catalogitem.serialize])
+
+
 # Displays all items of a category
 @public_page.route('/catalog/<string:category>/items', methods = ['GET'])
 @public_page.route('/catalog/<string:category>', methods = ['GET'])
@@ -40,7 +47,7 @@ def viewCategory(category):
 
 
 # Displays the selected item
-@public_page.route('/catalog/<string:category>/items/<int:item_id>', 
+@public_page.route('/catalog/<string:category>/items/<int:item_id>',
     methods = ['GET'])
 def viewCatalogItem(category, item_id):
     item = session.query(CatalogItem).filter_by(id = item_id).one()

@@ -17,7 +17,7 @@ private_page = Blueprint('private_page', __name__,
 def login_required(f):
     @wraps(f)
     def decorated_function(*args, **kwargs):
-        if 'userid' not in login_session:
+        if 'user_id' not in login_session:
             flash("Please sign in first before accessing this page.")
             return redirect(url_for('loginSite'))
         return f(*args, **kwargs)
@@ -44,7 +44,7 @@ def newItem():
                 description = request.form['description'])
 
         # Retrieves the user
-        user_id = login_session['userid']
+        user_id = login_session['user_id']
         user = session.query(User).filter_by(id = int(user_id)).one()
 
         # Creates the record and saves it to the database
@@ -83,7 +83,7 @@ def editItem(item_id):
         return render_template('edititem.html', item = item)
 
     if request.method == 'POST':
-        user_id = login_session['userid']
+        user_id = login_session['user_id']
 
         # Checks that the item belongs to the rightful user
         if user_id == item.user_id:
@@ -122,7 +122,7 @@ def deleteItem(item_id):
         return render_template('deleteitem.html', item = item)
 
     if request.method == 'POST':
-        user_id = login_session['userid']
+        user_id = login_session['user_id']
 
         # Checks that the user is the rightful owner of the item
         if user_id == item.user.id:

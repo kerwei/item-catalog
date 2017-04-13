@@ -105,7 +105,7 @@ def loginSite():
 
             # Sets the login session if login is successful
             csrf_token = helpers.roast_chip(str(user.id) + user.name)
-            login_session['userid'] = user.id
+            login_session['user_id'] = user.id
             login_session['username'] = user.name
             login_session['picture'] = user.picture
             login_session['email'] = user.email
