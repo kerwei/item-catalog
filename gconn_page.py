@@ -6,7 +6,7 @@ import requests
 from flask import Blueprint, render_template, url_for, redirect, request
 from flask import abort, jsonify, flash, make_response
 from flask import session as login_session
-#from jinja2 import TemplateNotFound
+# from jinja2 import TemplateNotFound
 from oauth2client.client import flow_from_clientsecrets
 from oauth2client.client import FlowExchangeError
 
@@ -106,6 +106,7 @@ def gconnect():
 
     return welcome
 
+
 # Disconnects from Google Plus
 @gconn_page.route('/gdisconnect')
 def gdisconnect():
@@ -113,7 +114,8 @@ def gdisconnect():
     # If user is not connected
     if access_token is None:
         print 'Access Token is None'
-        response = make_response(json.dumps('Current user not connected.'), 401)
+        response = make_response(
+            json.dumps('Current user not connected.'), 401)
         response.headers['Content-Type'] = 'application/json'
         return response
     # Invokes the logout API end point
@@ -138,4 +140,3 @@ def gdisconnect():
         response.headers['Content-Type'] = 'application/json'
 
     return response
-    

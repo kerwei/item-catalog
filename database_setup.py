@@ -17,15 +17,15 @@ class User(Base):
     '''
     __tablename__ = 'user'
 
-    id = Column(Integer, primary_key = True)
-    name = Column(String(250), nullable = False)
-    email = Column(String(250), nullable = True)
-    picture = Column(String(1000), nullable = True)
-    salt = Column(String(250), nullable = False)
-    hashedpw = Column(String(250), nullable = False)
-    dt_added = Column(DateTime, 
-        nullable = False, 
-        default = datetime.datetime.now())
+    id = Column(Integer, primary_key=True)
+    name = Column(String(250), nullable=False)
+    email = Column(String(250), nullable=True)
+    picture = Column(String(1000), nullable=True)
+    salt = Column(String(250), nullable=False)
+    hashedpw = Column(String(250), nullable=False)
+    dt_added = Column(DateTime,
+        nullable=False,
+        default=datetime.datetime.now())
 
 
 class CatalogItem(Base):
@@ -34,18 +34,18 @@ class CatalogItem(Base):
     '''
     __tablename__ = 'catalog_item'
 
-    id = Column(Integer, primary_key = True)
-    name = Column(String(250), nullable = False)
+    id = Column(Integer, primary_key=True)
+    name = Column(String(250), nullable=False)
     price = Column(String(8))
     category = Column(String(250))
     description = Column(String(250))
-    dt_added = Column(DateTime, 
-        nullable = False, 
-        default = datetime.datetime.now())
-    dt_modded = Column(DateTime, 
-        nullable = False, 
-        default = datetime.datetime.now(), 
-        onupdate = datetime.datetime.now())
+    dt_added = Column(DateTime,
+        nullable=False,
+        default=datetime.datetime.now())
+    dt_modded = Column(DateTime,
+        nullable=False,
+        default=datetime.datetime.now(),
+        onupdate=datetime.datetime.now())
     user_id = Column(Integer, ForeignKey('user.id'))
     user = relationship(User)
 

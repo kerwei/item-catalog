@@ -10,7 +10,7 @@ from database_setup import Base, User
 # Starts the database
 engine = create_engine('sqlite:///catalogitem.db')
 Base.metadata.bind = engine
-DBSession = sessionmaker(bind = engine)
+DBSession = sessionmaker(bind=engine)
 session = DBSession()
 
 
@@ -27,8 +27,8 @@ def createUser(login_session):
     newUser = User(name=login_session['username'],
         email=login_session['email'],
         picture=login_session['picture'],
-        salt = hashbrown.split('|')[1],
-        hashedpw = hashbrown.split  ('|')[0])
+        salt=hashbrown.split('|')[1],
+        hashedpw=hashbrown.split('|')[0])
     session.add(newUser)
     session.commit()
     user = session.query(User).filter_by(email=login_session['email']).one()
@@ -56,7 +56,7 @@ def getUnique(cls_attr):
 
 
 # Get object properties sorted in ascending order
-def getAscending(cls_attr, order, limit = 0):
+def getAscending(cls_attr, order, limit=0):
     if limit == 0:
         return session.query(cls_attr).order_by(asc(order)).all()
     else:
@@ -64,7 +64,7 @@ def getAscending(cls_attr, order, limit = 0):
 
 
 # Get object properties sorted in descending order
-def getDescending(cls_attr, order, limit = 0):
+def getDescending(cls_attr, order, limit=0):
     if limit == 0:
         return session.query(cls_attr).order_by(desc(order)).all()
     else:

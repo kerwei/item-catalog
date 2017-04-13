@@ -42,7 +42,9 @@ def fbconnect():
     app_secret = json.loads(
         open('fb_client_secrets.json', 'r').read())['web']['app_secret']
     # Gets the access token
-    atoken_data = getapidata(fb_ref['atoken'], app_id, app_secret, access_token)
+    atoken_data = getapidata(fb_ref['atoken'],
+        app_id,
+        app_secret, access_token)
     token = atoken_data['access_token']
 
     # Gets the user info

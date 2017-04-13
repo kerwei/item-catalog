@@ -14,7 +14,7 @@ authenticate_page = Blueprint('authenticate_page', __name__,
 
 
 # User Signup
-@authenticate_page.route('/signup', methods = ['POST', 'GET'])
+@authenticate_page.route('/signup', methods=['POST', 'GET'])
 def signupSite():
     if request.method == 'GET':
         # Cases where users access the signup page via the URL
@@ -33,23 +33,23 @@ def signupSite():
         password = request.form['password']
         cpassword = request.form['cpassword']
         # Checks that the required fields are non-empty
-        nan_empty = helpers.nempty(username = user_name,
-            password = password,
-            cpassword = cpassword)
+        nan_empty = helpers.nempty(username=user_name,
+            password=password,
+            cpassword=cpassword)
 
         if nan_empty is not True:
-            # Throws error messages if there are empty fields. Retains the 
+            # Throws error messages if there are empty fields. Retains the
             # user name.
             flash("Please ensure all fields are filled before submitting.")
             return render_template('signup.html',
-                username = user_name,
-                nan_username = nan_empty['err_username'],
-                nan_password = nan_empty['err_password'],
-                nan_cpassword = nan_empty['err_cpassword'])
+                username=user_name,
+                nan_username=nan_empty['err_username'],
+                nan_password=nan_empty['err_password'],
+                nan_cpassword=nan_empty['err_cpassword'])
 
         # Checks that the entered user name and password meet the requirements
-        is_valid = helpers.valid(username = user_name,
-            password = password)
+        is_valid = helpers.valid(username=user_name,
+            password=password)
 
         # Proceeds if validation is successful
         if is_valid is True:
@@ -58,9 +58,9 @@ def signupSite():
                 # Generates the hashed password based on a random salt
                 hashbrown = helpers.make_pw_hash(user_name, password)
                 # Creates the User and persist it to the database
-                user = User(name  = user_name,
-                    salt = hashbrown.split('|')[1],
-                    hashedpw = hashbrown.split('|')[0])
+                user = User(name=user_name,
+                    salt=hashbrown.split('|')[1],
+                    hashedpw=hashbrown.split('|')[0])
                 session.add(user)
                 session.commit()
                 # Retrieves the entry that was just added to the database.
@@ -69,25 +69,25 @@ def signupSite():
                 login_session['userid'] = new_user.id
                 login_session['username'] = new_user.name
                 login_session['auth_type'] = "local"
- 
+
                 flash("User created successfully! Welcome %s!" % user_name)
                 return redirect(url_for('public_page.itemList'))
             else:
                 # Throws the password-not-matched error
                 flash("The passwords entered do not match. Please re-enter.")
-                return render_template('signup.html', username = user_name)
+                return render_template('signup.html', username=user_name)
         else:
             # Throws the error if the entered username/password do not meet
             # requirements. Retains the username.
             flash("Username/password not valid. Please re-enter.")
             return render_template('signup.html',
-                username = user_name,
-                err_username = is_valid['err_username'],
-                err_password = is_valid['err_password'])
+                username=user_name,
+                err_username=is_valid['err_username'],
+                err_password=is_valid['err_password'])
 
 
 # Logs out from the site
-@authenticate_page.route('/logout', methods = ['GET'])
+@authenticate_page.route('/logout', methods=['GET'])
 def logoutSite():
     # Checks if the user is logged through OAuth2. Redirects to the
     # corresponding functions as necessary.

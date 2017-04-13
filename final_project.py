@@ -44,7 +44,7 @@ csrf = SeaSurf(app)
 # the login function to the authenticate_page module.
 # CSRF not relevant prior to user login
 @csrf.exempt
-@app.route('/login', methods = ['POST', 'GET'])
+@app.route('/login', methods=['POST', 'GET'])
 def loginSite():
     if request.method == 'GET':
         # Redirects the user back to the main landing page if he/she is already
@@ -60,24 +60,24 @@ def loginSite():
         user_name = request.form['name']
         password = request.form['password']
         # Checks that the required fields are not empty
-        nan_empty = helpers.nempty(username = user_name,
-            password = password)
+        nan_empty = helpers.nempty(username=user_name,
+            password=password)
         # Throws the warning message if one of the fields is empty
         if nan_empty is not True:
             flash("Please ensure all fields are filled before submitting.")
-            return render_template('login.html', nan_message = nan_empty)
+            return render_template('login.html', nan_message=nan_empty)
         # Checks that the entered characters are valid
-        is_valid = helpers.valid(username = user_name,
-            password = password)
+        is_valid = helpers.valid(username=user_name,
+            password=password)
 
         if is_valid is True:
-            username = session.query(User).filter_by(name = user_name).all()
+            username = session.query(User).filter_by(name=user_name).all()
 
             if username:
                 # Identical user names permitted by the site. Test the
                 # validity of the entered password by looping through the salt,
-                # generating the hash for each combination and check against the
-                # hashedpw stored in the db
+                # generating the hash for each combination and check against
+                # the hashedpw stored in the db
                 for each in username:
                     salt = each.salt
                     hashedpw = helpers.make_pw_hash(user_name,
@@ -89,19 +89,19 @@ def loginSite():
                         # username as well. Only danger left is when two
                         # users have the same name and password combination
                         user = session.query(User).filter_by(
-                            hashedpw = hashedpw).one()
+                            hashedpw=hashedpw).one()
                         if user:
-                           break
+                            break
                     except NoResultFound:
                         user = None
 
                 if not user:
                     flash("The entered password was incorrect. \
                         Please try again.")
-                    return render_template('login.html', username = user_name)
+                    return render_template('login.html', username=user_name)
             else:
                 flash("User does not exist. Please check your username.")
-                return render_template('login.html', username = user_name)
+                return render_template('login.html', username=user_name)
 
             # Sets the login session if login is successful
             csrf_token = helpers.roast_chip(str(user.id) + user.name)
@@ -115,9 +115,9 @@ def loginSite():
         else:
             flash("Username/password not valid. Please re-enter.")
             return render_template('login.html',
-                username = user_name,
-                err_username = is_valid['err_username'],
-                err_password = is_valid['err_password'])
+                username=user_name,
+                err_username=is_valid['err_username'],
+                err_password=is_valid['err_password'])
 
 
 if __name__ == '__main__':
