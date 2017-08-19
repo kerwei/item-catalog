@@ -4,10 +4,11 @@ import random
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
-import authenticate
+import helpers
 from database_setup import Base, User, CatalogItem
 
-engine = create_engine('sqlite:///catalogitem.db')
+#engine = create_engine('sqlite:///catalogitem.db')
+engine = create_engine('postgresql+psycopg2://catalog:logacat@localhost/itemcatalog')
 # Bind the engine to the metadata of the Base class so that the
 # declaratives can be accessed through a DBSession instance
 Base.metadata.bind = engine
@@ -26,7 +27,7 @@ password = 'password'
 f = list(codecs.open('names.txt', encoding='utf-8-sig', mode='rb'))
 # Menu for UrbanBurger
 name = random.choice(f).replace('\r\n', '').replace(' ', '_')
-hashbrown = authenticate.make_pw_hash(name, password)
+hashbrown = helpers.make_pw_hash(name, password)
 user1 = User(name=name, salt=hashbrown.split('|')[1], hashedpw=hashbrown.split('|')[0])
 
 session.add(user1)
@@ -90,7 +91,7 @@ session.commit()
 
 # Menu for Super Stir Fry
 name = random.choice(f).replace('\r\n', '').replace(' ', '_')
-hashbrown = authenticate.make_pw_hash(name, password)
+hashbrown = helpers.make_pw_hash(name, password)
 user2 = User(name=name, salt=hashbrown.split('|')[1], hashedpw=hashbrown.split('|')[0])
 
 session.add(user2)
@@ -136,7 +137,7 @@ session.commit()
 
 # Menu for Panda Garden
 name = random.choice(f).replace('\r\n', '').replace(' ', '_')
-hashbrown = authenticate.make_pw_hash(name, password)
+hashbrown = helpers.make_pw_hash(name, password)
 user1 = User(name=name, salt=hashbrown.split('|')[1], hashedpw=hashbrown.split('|')[0])
 
 session.add(user1)
@@ -176,7 +177,7 @@ session.commit()
 
 # Menu for Thyme for that
 name = random.choice(f).replace('\r\n', '').replace(' ', '_')
-hashbrown = authenticate.make_pw_hash(name, password)
+hashbrown = helpers.make_pw_hash(name, password)
 user1 = User(name=name, salt=hashbrown.split('|')[1], hashedpw=hashbrown.split('|')[0])
 
 session.add(user1)
@@ -222,7 +223,7 @@ session.commit()
 
 # Menu for Tony's Bistro
 name = random.choice(f).replace('\r\n', '').replace(' ', '_')
-hashbrown = authenticate.make_pw_hash(name, password)
+hashbrown = helpers.make_pw_hash(name, password)
 user1 = User(name=name, salt=hashbrown.split('|')[1], hashedpw=hashbrown.split('|')[0])
 
 session.add(user1)
@@ -262,7 +263,7 @@ session.commit()
 
 # Menu for Andala's
 name = random.choice(f).replace('\r\n', '').replace(' ', '_')
-hashbrown = authenticate.make_pw_hash(name, password)
+hashbrown = helpers.make_pw_hash(name, password)
 user1 = User(name=name, salt=hashbrown.split('|')[1], hashedpw=hashbrown.split('|')[0])
 
 session.add(user1)
@@ -302,7 +303,7 @@ session.commit()
 
 # Menu for Auntie Ann's
 name = random.choice(f).replace('\r\n', '').replace(' ', '_')
-hashbrown = authenticate.make_pw_hash(name, password)
+hashbrown = helpers.make_pw_hash(name, password)
 user1 = User(name=name, salt=hashbrown.split('|')[1], hashedpw=hashbrown.split('|')[0])
 
 session.add(user1)
@@ -354,7 +355,7 @@ session.commit()
 
 # Menu for Cocina Y Amor
 name = random.choice(f).replace('\r\n', '').replace(' ', '_')
-hashbrown = authenticate.make_pw_hash(name, password)
+hashbrown = helpers.make_pw_hash(name, password)
 user1 = User(name=name, salt=hashbrown.split('|')[1], hashedpw=hashbrown.split('|')[0])
 
 session.add(user1)
@@ -373,7 +374,7 @@ catalogItem2 = CatalogItem(name="Cachapa", description="Golden brown, corn-based
 session.add(catalogItem2)
 session.commit()
 
-hashbrown = authenticate.make_pw_hash(name, password)
+hashbrown = helpers.make_pw_hash(name, password)
 user1 = User(name=name, salt=hashbrown.split('|')[1], hashedpw=hashbrown.split('|')[0])
 session.add(user1)
 session.commit()

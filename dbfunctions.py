@@ -8,7 +8,8 @@ from database_setup import Base, User
 
 
 # Starts the database
-engine = create_engine('sqlite:///catalogitem.db')
+#engine = create_engine('sqlite:///catalogitem.db')
+engine = create_engine('postgresql+psycopg2://catalog:logacat@localhost/itemcatalog')
 Base.metadata.bind = engine
 DBSession = sessionmaker(bind=engine)
 session = DBSession()
